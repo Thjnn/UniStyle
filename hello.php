@@ -1,0 +1,1 @@
+<?php echo "Web vẫn chạy bình thường"; ?>
