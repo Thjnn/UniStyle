@@ -141,6 +141,34 @@
   .contact-right {
     height: 300px;
   }
+  .footer-newsletter {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .newsletter-text h2 {
+    font-size: 22px;
+  }
+
+  .newsletter-text p {
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+
+  .newsletter-form {
+    width: 100%;
+    flex-direction: row;
+  }
+
+  .newsletter-form input {
+    flex: 1;
+    min-width: unset;
+    width: 100%;
+  }
+
+  .newsletter-form button {
+    flex-shrink: 0;
+  }
 }
 
 @media (max-width: 480px) {

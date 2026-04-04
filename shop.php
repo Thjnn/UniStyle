@@ -243,7 +243,7 @@ require_once "./config/db.php";
         <div class="product-grid">
           <?php
           // 1. Truy vấn lấy sản phẩm ngẫu nhiên dựa trên tên cột thực tế trong DB của bạn
-          $sql_product = "SELECT * FROM sanpham ORDER BY RAND() LIMIT 12";
+          $sql_product = "SELECT * FROM sanpham ORDER BY RAND() LIMIT 100";
           $result_product = mysqli_query($conn, $sql_product);
 
           if ($result_product && mysqli_num_rows($result_product) > 0) {
@@ -298,7 +298,32 @@ require_once "./config/db.php";
             echo "<p>Đang cập nhật sản phẩm...</p>";
           }
           ?>
+
         </div>
+        <button id="loadMoreBtn">Xem thêm</button>
+        <script>
+          const items = document.querySelectorAll(".product-card");
+          const loadMoreBtn = document.getElementById("loadMoreBtn");
+
+          let visible = 8;
+
+          function showItems() {
+            items.forEach((item, index) => {
+              item.style.display = index < visible ? "block" : "none";
+            });
+
+            if (visible >= items.length) {
+              btn.style.display = "none";
+            }
+          }
+
+          loadMoreBtn.addEventListener("click", () => {
+            visible += 8;
+            showItems();
+          });
+
+          showItems();
+        </script>
       </div>
     </div>
     <!-- HTML Filter Overlay (mobile) -->
@@ -335,19 +360,18 @@ require_once "./config/db.php";
     <span class="material-symbols-outlined"> keyboard_arrow_up </span>
   </button>
   <script>
-    const btn = document.getElementById("backToTop");
+    const backToTopBtn = document.getElementById("backToTop");
 
     // Hiện nút khi scroll xuống
     window.onscroll = function() {
       if (document.documentElement.scrollTop > 200) {
-        btn.style.display = "block";
+        backToTopBtn.style.display = "block";
       } else {
-        btn.style.display = "none";
+        backToTopBtn.style.display = "none";
       }
     };
 
-    // Click để lên đầu trang
-    btn.onclick = function() {
+    backToTopBtn.onclick = function() {
       window.scrollTo({
         top: 0,
         behavior: "smooth",

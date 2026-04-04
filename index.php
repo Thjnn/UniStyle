@@ -46,13 +46,13 @@ $result_sp = mysqli_query($conn, $sql_sp);
           <span class="material-symbols-outlined">menu</span>
         </div>
         <div class="logo">
-          <a href="index.html"><img
+          <a href="index.php"><img
               src="./assets/file_anh/0c4690d7-3599-4de4-a0a4-841817ead1c0.png"
               alt="" /></a>
         </div>
         <nav>
           <ul>
-            <li><a href="index.html">Trang chủ</a></li>
+            <li><a href="index.php">Trang chủ</a></li>
 
             <li class="has-submenu">
               <a href="shop.php">Cửa hàng</a>
@@ -273,57 +273,57 @@ $result_sp = mysqli_query($conn, $sql_sp);
       </div>
 
       <div class="products-grid">
-        <?php while ($row_sp = mysqli_fetch_assoc($result_sp)) { ?>
-          <div class="product-card">
-            <div class="product-img">
-              <img src="./assets/file_anh/San_Pham/<?= $row_sp['Hinh'] ?>" alt="<?= $row_sp['TenSP'] ?>" />
-            </div>
+        <?php while ($row_sp = mysqli_fetch_assoc($result_sp)) {
+          $rating = isset($row_sp['Rating']) ? (int)$row_sp['Rating'] : 5;
+          $luot_dg = isset($row_sp['SoLuotDanhGia']) ? $row_sp['SoLuotDanhGia'] : 0;
+        ?>
 
-            <div class="product-info">
-              <div class="product-tag">
-                <span class="new">👍 New</span>
-                <span class="sold">📊 Đã bán <?= $row_sp['SoLuongDaBan'] ?></span>
+          <a href="product_detail.php?id=<?= $row_sp['MaSP'] ?>" class="product-link">
+            <div class="product-card">
+              <div class="product-img">
+                <img src="./assets/file_anh/San_Pham/<?= $row_sp['Hinh'] ?>" alt="<?= $row_sp['TenSP'] ?>" />
               </div>
 
-              <h3 class="product-name">
-                <a href="product_detail.php?id=<?= $row_sp['MaSP'] ?>" style="text-decoration:none; color:inherit;">
-                  <?= $row_sp['TenSP'] ?>
-                </a>
-              </h3>
-
-              <div class="rating">
-                <?php
-                // Kiểm tra nếu biến $sp tồn tại và có giá trị Rating, nếu không mặc định là 5
-                $rating = isset($sp['Rating']) ? (int)$sp['Rating'] : 5;
-                $luot_dg = isset($sp['SoLuotDanhGia']) ? $sp['SoLuotDanhGia'] : 0;
-
-                // Hiển thị sao vàng
-                for ($i = 1; $i <= $rating; $i++) {
-                  echo '<span style="color: #ffc107;">★</span>';
-                }
-                // Hiển thị sao trống cho đủ 5 sao
-                for ($i = 1; $i <= (5 - $rating); $i++) {
-                  echo '<span style="color: #ccc;">★</span>';
-                }
-                ?>
-                <span style="font-size: 0.8rem; color: #666;">(<?= $luot_dg ?>)</span>
-              </div>
-
-              <div class="price"><?= number_format($row_sp['GiaBan'], 0, ',', '.') ?>đ</div>
-
-              <?php if (!empty($row_sp['MaKhuyenMai'])): ?>
-                <div class="old-price">
-                  <span class="discount">Đang có ưu đãi</span>
+              <div class="product-info">
+                <div class="product-tag">
+                  <span class="new">👍 New</span>
+                  <span class="sold">📊 Đã bán <?= $row_sp['SoLuongDaBan'] ?></span>
                 </div>
-              <?php endif; ?>
+
+                <h3 class="product-name">
+                  <?= $row_sp['TenSP'] ?>
+                </h3>
+
+                <div class="rating">
+                  <?php
+                  for ($i = 1; $i <= 5; $i++) {
+                    echo ($i <= $rating)
+                      ? '<span style="color: #ffc107;">★</span>'
+                      : '<span style="color: #ccc;">★</span>';
+                  }
+                  ?>
+                  <span>(<?= $luot_dg ?>)</span>
+                </div>
+
+                <div class="price">
+                  <?= number_format($row_sp['GiaBan'], 0, ',', '.') ?>đ
+                </div>
+
+                <?php if (!empty($row_sp['MaKhuyenMai'])): ?>
+                  <div class="old-price">
+                    <span class="discount">Đang có ưu đãi</span>
+                  </div>
+                <?php endif; ?>
+              </div>
             </div>
-          </div>
+          </a>
+
         <?php } ?>
       </div>
 
       <!-- Button -->
       <div class="see-more">
-        <button class="see-more-btn">Xem thêm sản phẩm</button>
+        <a href="shop.php" class="see-more-btn">Xem thêm sản phẩm</a>
       </div>
     </section>
     <!-- Back To School Banner -->
@@ -398,59 +398,59 @@ $result_sp = mysqli_query($conn, $sql_sp);
 
       <div class="products-grid">
         <?php
-        // 1. Truy vấn sản phẩm thuộc danh mục Giày (6) và Balo (5)
-        // Lấy 8 sản phẩm mới nhất (sắp xếp theo MaSP giảm dần)
         $sql_fashion = "SELECT * FROM sanpham WHERE madanhmuc IN (5, 6) ORDER BY MaSP DESC LIMIT 8";
         $result_fashion = mysqli_query($conn, $sql_fashion);
 
-        // 2. Kiểm tra nếu có sản phẩm dữ liệu
         if (mysqli_num_rows($result_fashion) > 0) {
           while ($sp = mysqli_fetch_assoc($result_fashion)) {
-            // Chuẩn bị dữ liệu hiển thị (Rating, Lượt đánh giá, v.v.)
             $rating = isset($sp['Rating']) ? (int)$sp['Rating'] : 5;
             $luot_dg = isset($sp['SoLuotDanhGia']) ? $sp['SoLuotDanhGia'] : 0;
         ?>
-            <div class="product-card">
-              <div class="product-img">
-                <img src="./assets/file_anh/San_Pham/<?= $sp['Hinh'] ?>" alt="<?= $sp['TenSP'] ?>" />
-              </div>
 
-              <div class="product-info">
-                <div class="product-tag">
-                  <span class="new">👍 New</span>
-                  <span class="sold">📊 Đã bán <?= number_format($sp['SoLuongDaBan']) ?></span>
+            <a href="detail.php?id=<?= $sp['MaSP'] ?>" class="product-link">
+              <div class="product-card">
+                <div class="product-img">
+                  <img src="./assets/file_anh/San_Pham/<?= $sp['Hinh'] ?>" alt="<?= $sp['TenSP'] ?>" />
                 </div>
 
-                <h3 class="product-name">
-                  <a href="detail.php?id=<?= $sp['MaSP'] ?>" style="text-decoration: none; color: inherit;">
-                    <?= $sp['TenSP'] ?>
-                  </a>
-                </h3>
-
-                <div class="rating">
-                  <?php
-                  for ($i = 1; $i <= 5; $i++) {
-                    // Hiển thị sao vàng cho đến khi đạt số sao rating, sau đó hiển thị sao xám
-                    echo ($i <= $rating) ? '<span style="color: #ffc107;">★</span>' : '<span style="color: #ccc;">★</span>';
-                  }
-                  ?>
-                  <span>(<?= $luot_dg ?>)</span>
-                </div>
-
-                <div class="price"><?= number_format($sp['GiaBan'], 0, ',', '.') ?>đ</div>
-
-                <?php if (isset($sp['GiaCu']) && $sp['GiaCu'] > $sp['GiaBan']): ?>
-                  <div class="old-price">
-                    <?= number_format($sp['GiaCu'], 0, ',', '.') ?>đ
-                    <span class="discount">-<?= round((($sp['GiaCu'] - $sp['GiaBan']) / $sp['GiaCu']) * 100) ?>%</span>
+                <div class="product-info">
+                  <div class="product-tag">
+                    <span class="new">👍 New</span>
+                    <span class="sold">📊 Đã bán <?= number_format($sp['SoLuongDaBan']) ?></span>
                   </div>
-                <?php endif; ?>
+
+                  <h3 class="product-name">
+                    <?= $sp['TenSP'] ?>
+                  </h3>
+
+                  <div class="rating">
+                    <?php
+                    for ($i = 1; $i <= 5; $i++) {
+                      echo ($i <= $rating)
+                        ? '<span style="color: #ffc107;">★</span>'
+                        : '<span style="color: #ccc;">★</span>';
+                    }
+                    ?>
+                    <span>(<?= $luot_dg ?>)</span>
+                  </div>
+
+                  <div class="price"><?= number_format($sp['GiaBan'], 0, ',', '.') ?>đ</div>
+
+                  <?php if (isset($sp['GiaCu']) && $sp['GiaCu'] > $sp['GiaBan']): ?>
+                    <div class="old-price">
+                      <?= number_format($sp['GiaCu'], 0, ',', '.') ?>đ
+                      <span class="discount">
+                        -<?= round((($sp['GiaCu'] - $sp['GiaBan']) / $sp['GiaCu']) * 100) ?>%
+                      </span>
+                    </div>
+                  <?php endif; ?>
+                </div>
               </div>
-            </div>
+            </a>
+
         <?php
           }
         } else {
-          // Thông báo nếu không có sản phẩm nào thuộc Giày hoặc Balo
           echo "<p style='grid-column: 1/-1; text-align: center;'>Hiện chưa có sản phẩm nào trong danh mục Giày hoặc Balo.</p>";
         }
         ?>
