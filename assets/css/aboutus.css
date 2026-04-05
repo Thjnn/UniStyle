@@ -6,7 +6,7 @@
 
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #fff8f8;
+  background-color: white;
   color: #333;
 }
 
@@ -404,4 +404,225 @@ nav a:hover {
   color: white;
   background-color: #1e40af;
   transition: 0.8s;
+}
+.supplier-logos {
+  display: flex;
+  justify-content: center; /* căn giữa */
+  align-items: center;
+  gap: 5px; /* khoảng cách giữa các logo */
+  flex-wrap: wrap; /* xuống dòng khi màn hình nhỏ */
+}
+
+.supplier-card {
+  width: 220px; /* chỉnh kích thước card */
+  height: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.supplier-card-steadtler {
+  width: 220px; /* chỉnh kích thước card */
+  height: 250px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.supplier-card-stabilo {
+  width: 220px; /* chỉnh kích thước card */
+  height: 280px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.supplier-card img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+.shop-now-btn {
+  background: linear-gradient(135deg, #ff6a00, #ff914d);
+  color: #fff;
+  border: none;
+  padding: 14px 30px;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(255, 106, 0, 0.3);
+}
+
+/* hover */
+.shop-now-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 10px 25px rgba(255, 106, 0, 0.4);
+}
+
+/* khi bấm */
+.shop-now-btn:active {
+  transform: scale(0.95);
+}
+
+/* hiệu ứng glow nhẹ */
+.shop-now-btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50px;
+  opacity: 0;
+  transition: 0.3s;
+}
+
+.shop-now-btn:hover::after {
+  opacity: 1;
+}
+/* ============ FOOTER ============ */
+
+.footer {
+  background: #fff;
+  color: #1e1f26;
+  padding: 60px 8%;
+}
+
+/* newsletter */
+
+.footer-newsletter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 60px;
+}
+
+.newsletter-text h2 {
+  color: #ff6a3d;
+  font-size: 28px;
+}
+
+.newsletter-text p {
+  margin-top: 5px;
+  color: #aaa;
+}
+
+.newsletter-form {
+  display: flex;
+  background: white;
+  border-radius: 50px;
+  overflow: hidden;
+}
+
+.newsletter-form input {
+  padding: 15px 20px;
+  background: transparent;
+  color: #ff6a00;
+  width: 250px;
+  border-radius: 50px 0 0 50px;
+  border-color: #ff6a00;
+}
+
+.newsletter-form button {
+  border: none;
+  background: #ff6a3d;
+  padding: 15px 25px;
+  cursor: pointer;
+  color: white;
+}
+
+/* footer grid */
+
+.footer-container {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 40px;
+}
+
+.footer-col h3 {
+  color: rgb(15, 15, 15);
+  margin-bottom: 20px;
+}
+
+.footer-col ul {
+  list-style: none;
+}
+
+.footer-col ul li {
+  margin-bottom: 10px;
+}
+
+.footer-col ul li a {
+  text-decoration: none;
+  color: #aaa;
+  transition: 0.3s;
+}
+
+.footer-col ul li a:hover {
+  color: #ff6a3d;
+}
+
+/* logo */
+
+.logo {
+  color: #ff6a3d;
+  margin-bottom: 20px;
+}
+
+.footer-col span {
+  color: #ff6a3d;
+}
+
+/* social */
+
+.social-icons {
+  margin-top: 20px;
+  display: flex;
+  gap: 12px;
+}
+
+.social-icons a {
+  width: 40px;
+  height: 40px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: black;
+  font-size: 16px;
+  transition: 0.3s;
+}
+
+.social-icons a:hover {
+  background: #ff6b35;
+  color: white;
+}
+.section-title {
+  text-align: center; /* căn giữa */
+  font-size: 40px; /* tăng kích thước chữ */
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: center; /* căn giữa luôn cả khối */
+}
+.map-box h3 {
+  text-align: center;
+  font-size: 34px;
+  font-weight: 700;
+  color: #2d2d2d;
+  margin-bottom: 25px;
+  position: relative;
+}
+
+/* gạch chân nhẹ */
+.map-box h3::after {
+  content: "";
+  width: 80px;
+  height: 4px;
+  background: #ff6a00;
+  display: block;
+  margin: 10px auto 0;
+  border-radius: 2px;
 }

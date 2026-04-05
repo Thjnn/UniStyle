@@ -350,6 +350,17 @@ nav a:hover {
   font-size: 14px;
   color: #333;
 }
+.category-card.active-category {
+  border: 2px solid #007bff;
+  background: #f0f8ff;
+  transform: scale(1.05);
+}
+
+.category-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
 /* Mặc định ẩn các danh mục ngoài 8 mục đầu */
 .hidden-category {
   display: none;
@@ -411,24 +422,96 @@ nav a:hover {
 
 .filter-group {
   margin-bottom: 30px;
+  border-bottom: 1px solid #ddd;
 }
 
-.filter-group h3 {
-  font-size: 14px;
+.filter-section h4 {
+  font-size: 20px;
   color: #3b5cff;
   margin-bottom: 10px;
+  margin-top: 10px;
 }
 
-.filter-group label {
+.filter-section label {
   display: block;
-  margin: 8px 0;
-  font-size: 14px;
+  font-size: 16px;
+}
+.color-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
-.more {
-  font-size: 14px;
-  color: #777;
+.color-filter label {
   cursor: pointer;
+}
+
+.color-filter input {
+  display: none;
+}
+
+.color-box {
+  width: 25px;
+  height: 25px;
+  display: inline-block;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  transition: 0.2s;
+}
+
+/* Khi chọn */
+.color-filter input:checked + .color-box {
+  transform: scale(1.1);
+}
+
+/* DẤU TÍCH */
+.color-filter input:checked + .color-box::after {
+  content: "✔";
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* ============ NÚT ÁP DỤNG BỘ LỌC ============ */
+
+.btn-filter {
+  display: block;
+  width: 100%; /* Kéo dài full chiều ngang của sidebar */
+  background: linear-gradient(
+    135deg,
+    #1e56cb,
+    #3b5cff
+  ); /* Hiệu ứng chuyển màu xanh mượt mà */
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: bold;
+  text-transform: uppercase; /* Viết hoa chữ ÁP DỤNG */
+  text-align: center;
+  padding: 14px 0;
+  margin-top: 25px;
+  border: none;
+  border-radius: 10px; /* Bo góc cho đồng bộ với thiết kế */
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(30, 86, 203, 0.3); /* Đổ bóng màu xanh nhẹ */
+  transition: all 0.3s ease; /* Thời gian chuyển đổi mượt 0.3s */
+}
+
+/* Hiệu ứng khi di chuột (Hover) vào nút */
+.btn-filter:hover {
+  background: linear-gradient(135deg, #15409c, #1e56cb); /* Đậm màu hơn chút */
+  transform: translateY(-3px); /* Nảy nhẹ lên trên 3px */
+  box-shadow: 0 6px 15px rgba(30, 86, 203, 0.4); /* Bóng đổ to và rõ hơn */
+}
+
+/* Hiệu ứng khi click (nhấn giữ) vào nút */
+.btn-filter:active {
+  transform: translateY(0); /* Lún xuống lại vị trí ban đầu */
+  box-shadow: 0 2px 5px rgba(30, 86, 203, 0.3);
 }
 
 /* Content */

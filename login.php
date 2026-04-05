@@ -1,3 +1,66 @@
+<?php
+session_start();
+include './config/db.php'; 
+
+$login_error = ''; 
+$register_error = '';
+$register_success = '';
+
+if (isset($_POST['btn_dangnhap'])) {
+    $tendangnhap = $_POST['tendangnhap'];
+    $matkhau = $_POST['matkhau'];
+    
+    $sql_kh = "SELECT * FROM khachhang WHERE tendangnhap = '$tendangnhap' AND matkhau = '$matkhau'";
+    $result_kh = $conn->query($sql_kh);
+
+    if ($result_kh->num_rows > 0) {
+        $row = $result_kh->fetch_assoc();
+        $_SESSION['khachhang_id'] = $row['makh'];
+        $_SESSION['khachhang_ten'] = $row['tenkh'];
+        header("Location: index.php");
+        exit();
+    } else {
+        $sql_ad = "SELECT * FROM quantrivien WHERE tendangnhap = '$tendangnhap' AND matkhau = '$matkhau'";
+        $result_ad = $conn->query($sql_ad);
+        
+        if ($result_ad->num_rows > 0) {
+            $row = $result_ad->fetch_assoc();
+            $_SESSION['admin_id'] = $row['maqtv'];
+            $_SESSION['admin_ten'] = $row['tenqtv'];
+            header("Location: admin/index.php");
+            exit();
+        } else {
+            $login_error = "Tên đăng nhập hoặc mật khẩu không chính xác!";
+        }
+    }
+}
+
+if (isset($_POST['btn_dangky'])) {
+    $hoten = $_POST['hoten'];
+    $tendangnhap = $_POST['tendangnhap'];
+    $matkhau = $_POST['matkhau'];
+    
+    $check_sql = "SELECT * FROM khachhang WHERE tendangnhap = '$tendangnhap'";
+    $check_res = $conn->query($check_sql);
+    
+    if ($check_res->num_rows > 0) {
+        $register_error = "Email hoặc Số điện thoại này đã được đăng ký!";
+    } else {
+        $sdt = '';
+        if (is_numeric($tendangnhap) && strlen($tendangnhap) == 10) {
+            $sdt = $tendangnhap;
+        }
+        
+        $insert_sql = "INSERT INTO khachhang (tenkh, tendangnhap, matkhau, sdt) VALUES ('$hoten', '$tendangnhap', '$matkhau', '$sdt')";
+        
+        if ($conn->query($insert_sql) === TRUE) {
+            $register_success = "Đăng ký thành công! Bạn có thể đăng nhập ngay.";
+        } else {
+            $register_error = "Đã xảy ra lỗi, vui lòng thử lại!";
+        }
+    }
+}
+?>
 <!doctype html>
 <html lang="vi">
   <head>
@@ -22,7 +85,7 @@
   <body>
     <header class="auth-header">
       <div class="container header-content">
-        <a href="index.html" class="logo-group">
+        <a href="index.php" class="logo-group">
           <img
             src="./assets/file_anh/0c4690d7-3599-4de4-a0a4-841817ead1c0.png"
             alt="Logo"
@@ -52,10 +115,11 @@
               <h2>Đăng nhập</h2>
             </div>
 
-            <form>
+            <form method="POST" action="login.php">
               <div class="form-group">
                 <input
                   type="text"
+                  name="tendangnhap"
                   id="loginContact"
                   placeholder="Email/Số điện thoại/Tên đăng nhập"
                   required
@@ -63,7 +127,7 @@
                 <div class="error-message" id="loginError"></div>
               </div>
               <div class="form-group" style="position: relative">
-                <input type="password" placeholder="Mật khẩu" required />
+                <input type="password" name="matkhau" placeholder="Mật khẩu" required />
                 <span
                   class="material-symbols-outlined toggle-password"
                   style="
@@ -77,7 +141,14 @@
                   >visibility_off</span
                 >
               </div>
-              <button type="submit" class="auth-submit-btn">Đăng nhập</button>
+              
+              <?php if($login_error != ''): ?>
+                <div style="color: #ee4d2d; font-size: 13px; margin-bottom: 10px; text-align: center;">
+                  <?php echo $login_error; ?>
+                </div>
+              <?php endif; ?>
+
+              <button type="submit" name="btn_dangnhap" class="auth-submit-btn">Đăng nhập</button>
 
               <div class="forgot-pass">
                 <a href="#!" id="switchToForgotPassword">Quên mật khẩu?</a>
@@ -99,13 +170,14 @@
               <h2>Đăng ký</h2>
             </div>
 
-            <form id="registerForm">
+            <form method="POST" action="login.php" id="registerForm">
               <div class="form-group">
-                <input type="text" placeholder="Họ và tên" required />
+                <input type="text" name="hoten" placeholder="Họ và tên" required />
               </div>
               <div class="form-group">
                 <input
                   type="text"
+                  name="tendangnhap"
                   id="regContact"
                   placeholder="Email hoặc Số điện thoại"
                   required
@@ -115,6 +187,7 @@
               <div class="form-group" style="position: relative">
                 <input
                   type="password"
+                  name="matkhau"
                   id="regPassword"
                   placeholder="Mật khẩu"
                   required
@@ -153,7 +226,20 @@
                 >
                 <div class="error-message" id="regPassError"></div>
               </div>
-              <button type="submit" class="auth-submit-btn">Đăng ký</button>
+              
+              <?php if($register_error != ''): ?>
+                <div style="color: #ee4d2d; font-size: 13px; margin-bottom: 10px; text-align: center;">
+                  <?php echo $register_error; ?>
+                </div>
+              <?php endif; ?>
+
+              <?php if($register_success != ''): ?>
+                <div style="color: #28a745; font-size: 13px; margin-bottom: 10px; text-align: center;">
+                  <?php echo $register_success; ?>
+                </div>
+              <?php endif; ?>
+
+              <button type="submit" name="btn_dangky" class="auth-submit-btn">Đăng ký</button>
             </form>
 
             <div class="switch-to-register">
@@ -287,7 +373,7 @@
         }
 
         switchToRegister.addEventListener("click", function (e) {
-          e.preventDefault();
+          if(e) e.preventDefault();
           hideAllForms();
           registerForm.style.display = "block";
           headerActionTitle.textContent = "Đăng ký";
@@ -314,6 +400,10 @@
           headerActionTitle.textContent = "Đăng nhập";
         });
 
+        <?php if($register_error != '' || $register_success != ''): ?>
+          switchToRegister.click();
+        <?php endif; ?>
+
         const togglePasswords = document.querySelectorAll(".toggle-password");
         togglePasswords.forEach((icon) => {
           icon.addEventListener("click", function () {
@@ -335,37 +425,40 @@
         const loginContact = document.getElementById("loginContact");
         const loginError = document.getElementById("loginError");
 
-        loginContact.addEventListener("input", function () {
-          loginError.style.display = "none";
-        });
+        if(loginContact) {
+            loginContact.addEventListener("input", function () {
+              if(loginError) loginError.style.display = "none";
+            });
+        }
 
-        document
-          .querySelector("#loginFormSection form")
-          .addEventListener("submit", function (e) {
-            const contactInput = loginContact.value.trim();
-            let isValid = true;
-            let msg = "";
+        const loginFormElement = document.querySelector("#loginFormSection form");
+        if(loginFormElement) {
+            loginFormElement.addEventListener("submit", function (e) {
+              const contactInput = loginContact.value.trim();
+              let isValid = true;
+              let msg = "";
 
-            if (contactInput.includes("@")) {
-              if (!emailRegex.test(contactInput)) {
-                isValid = false;
-                msg =
-                  "Email không hợp lệ (Hệ thống hỗ trợ @gmail.com, @yahoo.com...).";
+              if (contactInput.includes("@")) {
+                if (!emailRegex.test(contactInput)) {
+                  isValid = false;
+                  msg =
+                    "Email không hợp lệ (Hệ thống hỗ trợ @gmail.com, @yahoo.com...).";
+                }
+              } else if (/^\d+$/.test(contactInput)) {
+                if (!phoneRegex.test(contactInput)) {
+                  isValid = false;
+                  msg =
+                    "Số điện thoại đăng nhập phải đủ 10 số và bắt đầu bằng số 0.";
+                }
               }
-            } else if (/^\d+$/.test(contactInput)) {
-              if (!phoneRegex.test(contactInput)) {
-                isValid = false;
-                msg =
-                  "Số điện thoại đăng nhập phải đủ 10 số và bắt đầu bằng số 0.";
-              }
-            }
 
-            if (!isValid) {
-              e.preventDefault();
-              loginError.textContent = msg;
-              loginError.style.display = "block";
-            }
-          });
+              if (!isValid) {
+                e.preventDefault();
+                loginError.textContent = msg;
+                loginError.style.display = "block";
+              }
+            });
+        }
 
         const regContact = document.getElementById("regContact");
         const regPass = document.getElementById("regPassword");
@@ -373,58 +466,63 @@
         const regContactError = document.getElementById("regContactError");
         const regPassError = document.getElementById("regPassError");
 
-        regContact.addEventListener(
-          "input",
-          () => (regContactError.style.display = "none"),
-        );
-        regConfirmPass.addEventListener(
-          "input",
-          () => (regPassError.style.display = "none"),
-        );
-        regPass.addEventListener(
-          "input",
-          () => (regPassError.style.display = "none"),
-        );
+        if(regContact) {
+            regContact.addEventListener(
+              "input",
+              () => { if(regContactError) regContactError.style.display = "none"; }
+            );
+        }
+        if(regConfirmPass) {
+            regConfirmPass.addEventListener(
+              "input",
+              () => { if(regPassError) regPassError.style.display = "none"; }
+            );
+        }
+        if(regPass) {
+            regPass.addEventListener(
+              "input",
+              () => { if(regPassError) regPassError.style.display = "none"; }
+            );
+        }
 
-        document
-          .getElementById("registerForm")
-          .addEventListener("submit", function (e) {
-            const contactInput = regContact.value.trim();
-            const pass = regPass.value;
-            const confirmPass = regConfirmPass.value;
-            let isRegValid = true;
+        const registerFormElement = document.getElementById("registerForm");
+        if(registerFormElement) {
+            registerFormElement.addEventListener("submit", function (e) {
+              const contactInput = regContact.value.trim();
+              const pass = regPass.value;
+              const confirmPass = regConfirmPass.value;
+              let isRegValid = true;
 
-            if (
-              !phoneRegex.test(contactInput) &&
-              !emailRegex.test(contactInput)
-            ) {
-              regContactError.textContent =
-                "Vui lòng nhập SĐT hợp lệ (10 số, đầu 0) hoặc Email hợp lệ.";
-              regContactError.style.display = "block";
-              isRegValid = false;
-            }
+              if (
+                !phoneRegex.test(contactInput) &&
+                !emailRegex.test(contactInput)
+              ) {
+                regContactError.textContent =
+                  "Vui lòng nhập SĐT hợp lệ (10 số, đầu 0) hoặc Email hợp lệ.";
+                regContactError.style.display = "block";
+                isRegValid = false;
+              }
 
-            if (pass !== confirmPass) {
-              regPassError.textContent =
-                "Mật khẩu và Xác nhận mật khẩu không khớp!";
-              regPassError.style.display = "block";
-              isRegValid = false;
-            }
+              if (pass !== confirmPass) {
+                regPassError.textContent =
+                  "Mật khẩu và Xác nhận mật khẩu không khớp!";
+                regPassError.style.display = "block";
+                isRegValid = false;
+              }
 
-            if (!isRegValid) {
-              e.preventDefault();
-            }
-          });
+              if (!isRegValid) {
+                e.preventDefault();
+              }
+            });
+        }
       });
     </script>
-    <!-- Back to Top -->
     <button id="backToTop">
       <span class="material-symbols-outlined"> keyboard_arrow_up </span>
     </button>
     <script>
       const btn = document.getElementById("backToTop");
 
-      // Hiện nút khi scroll xuống
       window.onscroll = function () {
         if (document.documentElement.scrollTop > 200) {
           btn.style.display = "block";
@@ -433,7 +531,6 @@
         }
       };
 
-      // Click để lên đầu trang
       btn.onclick = function () {
         window.scrollTo({
           top: 0,

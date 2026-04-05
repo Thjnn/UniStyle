@@ -1,10 +1,10 @@
 <?php
-include("./config/db.php"); // Đường dẫn phải chính xác đến file bạn vừa nêu
+session_start(); // 🔥 BẮT BUỘC
 
+include("./config/db.php");
 
 $sql = "SELECT * FROM danhmuc LIMIT 6";
 $result = mysqli_query($conn, $sql);
-
 
 $sql_sp = "SELECT * FROM sanpham WHERE NoiBat = 1 LIMIT 8";
 $result_sp = mysqli_query($conn, $sql_sp);
@@ -93,9 +93,9 @@ $result_sp = mysqli_query($conn, $sql_sp);
                 </div>
               </div>
             </li>
-            <li><a href="contact.html">Liên hệ</a></li>
-            <li><a href="FAQ.html">FAQ</a></li>
-            <li><a href="aboutus.html">Về chúng tôi</a></li>
+            <li><a href="contact.php">Liên hệ</a></li>
+            <li><a href="FAQ.php">FAQ</a></li>
+            <li><a href="aboutus.php">Về chúng tôi</a></li>
           </ul>
         </nav>
         <div class="header-icons">
@@ -109,8 +109,15 @@ $result_sp = mysqli_query($conn, $sql_sp);
                 placeholder="Tìm sản phẩm..." />
             </form>
           </div>
-          <a href="package.html"><span class="material-symbols-outlined"> local_mall </span></a>
-          <a href="login.html"><span class="material-symbols-outlined"> person </span></a>
+          <a href="package.php"><span class="material-symbols-outlined"> local_mall </span></a>
+
+          <?php
+          if (isset($_SESSION['khachhang_id'])) {
+            echo '<a href="profile.php"><span class="material-symbols-outlined"> person </span></a>';
+          } else {
+            echo '<a href="login.php"><span class="material-symbols-outlined"> person </span></a>';
+          }
+          ?>
         </div>
       </div>
     </div>
@@ -206,21 +213,24 @@ $result_sp = mysqli_query($conn, $sql_sp);
         <h2 class="section-title">
           <span class="featured">Danh Mục</span> Nổi Bật
         </h2>
-        <a href="#!" class="view-all">Xem thêm danh mục →</a>
+        <a href="shop.php" class="view-all">Xem thêm danh mục →</a>
       </div>
 
       <div class="categories-grid">
 
         <?php while ($row = mysqli_fetch_assoc($result)) { ?>
 
-          <div class="category-card">
+          <a href="shop.php?category_id=<?= $row['madanhmuc'] ?>" class="category-card">
+
             <div class="category-icon">
               <img src="./assets/file_anh/San_Pham/<?= $row['hinhanh'] ?>" alt="" />
             </div>
+
             <div class="category-name">
               <?= $row['tendanhmuc'] ?>
             </div>
-          </div>
+
+          </a>
 
         <?php } ?>
 
@@ -237,12 +247,12 @@ $result_sp = mysqli_query($conn, $sql_sp);
             <p class="promo-card-description">
               Sắm sửa đầy đủ đồ dùng học tập chất lượng cao
             </p>
-            <button class="promo-card-btn">Khám Phá →</button>
+            <a href="product-detail.php?id=107" class="promo-card-btn">
+              Khám Phá
+            </a>
           </div>
           <div class="promo-card-image">
-            <img
-              src="./assets/file_anh/832c1d98ef4f72a3518069cb762b449f-removebg-preview.png"
-              alt="" />
+            <img src="./assets/file_anh/832c1d98ef4f72a3518069cb762b449f-removebg-preview.png" alt="" />
           </div>
         </div>
 
@@ -254,12 +264,12 @@ $result_sp = mysqli_query($conn, $sql_sp);
             <p class="promo-card-description">
               Balo & phụ kiện thời trang cho teen
             </p>
-            <button class="promo-card-btn">Mua Ngay →</button>
+            <a href="product-detail.php?id=108" class="promo-card-btn">
+              Mua Ngay
+            </a>
           </div>
           <div class="promo-card-image">
-            <img
-              src="./assets/file_anh/phu-kien-thoi-trang-12-removebg-preview.png"
-              alt="" />
+            <img src="./assets/file_anh/phu-kien-thoi-trang-12-removebg-preview.png" alt="" />
           </div>
         </div>
       </div>
@@ -278,7 +288,7 @@ $result_sp = mysqli_query($conn, $sql_sp);
           $luot_dg = isset($row_sp['SoLuotDanhGia']) ? $row_sp['SoLuotDanhGia'] : 0;
         ?>
 
-          <a href="product_detail.php?id=<?= $row_sp['MaSP'] ?>" class="product-link">
+          <a href="product-detail.php?id=<?= $row_sp['MaSP'] ?>" class="product-link">
             <div class="product-card">
               <div class="product-img">
                 <img src="./assets/file_anh/San_Pham/<?= $row_sp['Hinh'] ?>" alt="<?= $row_sp['TenSP'] ?>" />
@@ -397,17 +407,22 @@ $result_sp = mysqli_query($conn, $sql_sp);
       </div>
 
       <div class="products-grid">
-        <?php
-        $sql_fashion = "SELECT * FROM sanpham WHERE madanhmuc IN (5, 6) ORDER BY MaSP DESC LIMIT 8";
-        $result_fashion = mysqli_query($conn, $sql_fashion);
-
+        <?php $sql_fashion = "SELECT * FROM sanpham WHERE madanhmuc IN (5, 6)
+          ORDER BY MaSP DESC LIMIT 8";
+        $result_fashion = mysqli_query(
+          $conn,
+          $sql_fashion
+        );
         if (mysqli_num_rows($result_fashion) > 0) {
-          while ($sp = mysqli_fetch_assoc($result_fashion)) {
-            $rating = isset($sp['Rating']) ? (int)$sp['Rating'] : 5;
-            $luot_dg = isset($sp['SoLuotDanhGia']) ? $sp['SoLuotDanhGia'] : 0;
-        ?>
+          while ($sp
+            = mysqli_fetch_assoc($result_fashion)
+          ) {
+            $rating =
+              isset($sp['Rating']) ? (int)$sp['Rating'] : 5;
+            $luot_dg =
+              isset($sp['SoLuotDanhGia']) ? $sp['SoLuotDanhGia'] : 0; ?>
 
-            <a href="detail.php?id=<?= $sp['MaSP'] ?>" class="product-link">
+            <a href="product-detail.php?id=<?= $sp['MaSP'] ?>" class="product-link">
               <div class="product-card">
                 <div class="product-img">
                   <img src="./assets/file_anh/San_Pham/<?= $sp['Hinh'] ?>" alt="<?= $sp['TenSP'] ?>" />
@@ -419,28 +434,30 @@ $result_sp = mysqli_query($conn, $sql_sp);
                     <span class="sold">📊 Đã bán <?= number_format($sp['SoLuongDaBan']) ?></span>
                   </div>
 
-                  <h3 class="product-name">
-                    <?= $sp['TenSP'] ?>
-                  </h3>
+                  <h3 class="product-name"><?= $sp['TenSP'] ?></h3>
 
                   <div class="rating">
-                    <?php
-                    for ($i = 1; $i <= 5; $i++) {
-                      echo ($i <= $rating)
-                        ? '<span style="color: #ffc107;">★</span>'
-                        : '<span style="color: #ccc;">★</span>';
-                    }
-                    ?>
+                    <?php for ($i = 1; $i <= 5; $i++) {
+                      echo ($i <= $rating) ?
+                        '<span style="color: #ffc107">★</span>' : '<span
+                    style="color: #ccc"
+                    >★</span
+                  >';
+                    } ?>
                     <span>(<?= $luot_dg ?>)</span>
                   </div>
 
-                  <div class="price"><?= number_format($sp['GiaBan'], 0, ',', '.') ?>đ</div>
+                  <div class="price">
+                    <?= number_format($sp['GiaBan'], 0, ',', '.') ?>đ
+                  </div>
 
-                  <?php if (isset($sp['GiaCu']) && $sp['GiaCu'] > $sp['GiaBan']): ?>
+                  <?php if (isset($sp['GiaCu']) && $sp['GiaCu'] > $sp['GiaBan']):
+                  ?>
                     <div class="old-price">
                       <?= number_format($sp['GiaCu'], 0, ',', '.') ?>đ
                       <span class="discount">
-                        -<?= round((($sp['GiaCu'] - $sp['GiaBan']) / $sp['GiaCu']) * 100) ?>%
+                        -<?= round((($sp['GiaCu'] - $sp['GiaBan']) / $sp['GiaCu']) *
+                            100) ?>%
                       </span>
                     </div>
                   <?php endif; ?>
@@ -448,12 +465,14 @@ $result_sp = mysqli_query($conn, $sql_sp);
               </div>
             </a>
 
-        <?php
-          }
+        <?php }
         } else {
-          echo "<p style='grid-column: 1/-1; text-align: center;'>Hiện chưa có sản phẩm nào trong danh mục Giày hoặc Balo.</p>";
-        }
-        ?>
+          echo "
+<p style='grid-column: 1/-1; text-align: center'>
+  Hiện chưa có sản phẩm nào trong danh mục Giày hoặc Balo.
+</p>
+";
+        } ?>
       </div>
 
       <div class="see-more">
@@ -543,7 +562,6 @@ $result_sp = mysqli_query($conn, $sql_sp);
 
   <!-- Footer -->
   <footer class="footer">
-    <!-- Newsletter -->
     <div class="footer-newsletter">
       <div class="newsletter-text">
         <h2>Đăng ký để nhận ưu đãi</h2>
@@ -561,9 +579,7 @@ $result_sp = mysqli_query($conn, $sql_sp);
       </div>
     </div>
 
-    <!-- Footer content -->
     <div class="footer-container">
-      <!-- Logo + contact -->
       <div class="footer-col">
         <h2 class="logo">
           <img
@@ -574,7 +590,7 @@ $result_sp = mysqli_query($conn, $sql_sp);
         <p>
           Nếu bạn có bất kỳ thắc mắc nào, vui lòng liên hệ với chúng tôi theo
           địa chỉ sau:
-          <span>support@example.</span>
+          <span>support@example.com</span>
         </p>
 
         <p>📍 16 Thiên Hộ Vương, P1, Mỹ Tho, Tiền Giang</p>
@@ -589,42 +605,39 @@ $result_sp = mysqli_query($conn, $sql_sp);
         </div>
       </div>
 
-      <!-- Công ty -->
       <div class="footer-col">
         <h3>Công ty</h3>
         <ul>
-          <li><a href="#">Tuyển dụng</a></li>
-          <li><a href="#">Về chúng tôi</a></li>
-          <li><a href="#">Quy tắc kinh doanh</a></li>
-          <li><a href="#">Hợp tác sự kiện</a></li>
-          <li><a href="#">Nhà cung cấp</a></li>
-          <li><a href="#">Chương trình cộng tác viên</a></li>
+          <li><a href="aboutus.php">Tuyển dụng</a></li>
+          <li><a href="aboutus.php">Về chúng tôi</a></li>
+          <li><a href="aboutus.php">Quy tắc kinh doanh</a></li>
+          <li><a href="aboutus.php">Hợp tác sự kiện</a></li>
+          <li><a href="aboutus.php">Nhà cung cấp</a></li>
+          <li><a href="aboutus.php">Chương trình cộng tác viên</a></li>
         </ul>
       </div>
 
-      <!-- Chăm sóc khách hàng -->
       <div class="footer-col">
         <h3>Chăm sóc khách hàng</h3>
         <ul>
-          <li><a href="#">Theo dõi đơn hàng</a></li>
-          <li><a href="#">Đổi / Trả hàng</a></li>
-          <li><a href="#">Thông tin vận chuyển</a></li>
-          <li><a href="#">Chính sách bảo hành</a></li>
-          <li><a href="#">Hệ thống cửa hàng</a></li>
-          <li><a href="#">Liên hệ</a></li>
+          <li><a href="contact.php">Theo dõi đơn hàng</a></li>
+          <li><a href="FAQ.php">Đổi / Trả hàng</a></li>
+          <li><a href="FAQ.php">Thông tin vận chuyển</a></li>
+          <li><a href="FAQ.php">Chính sách bảo hành</a></li>
+          <li><a href="FAQ.php">Hệ thống cửa hàng</a></li>
+          <li><a href="contact.php">Liên hệ</a></li>
         </ul>
       </div>
 
-      <!-- Dịch vụ -->
       <div class="footer-col">
         <h3>Dịch vụ</h3>
         <ul>
-          <li><a href="#">In ấn - Photo</a></li>
-          <li><a href="#">Đóng gáy tài liệu</a></li>
-          <li><a href="#">Laminating (Ép nhựa)</a></li>
-          <li><a href="#">Cung cấp sỉ văn phòng phẩm</a></li>
-          <li><a href="#">Đặt hàng theo yêu cầu</a></li>
-          <li><a href="#">Trung tâm hỗ trợ</a></li>
+          <li><a href="contact.php">In ấn - Photo</a></li>
+          <li><a href="shop.php">Đóng gáy tài liệu</a></li>
+          <li><a href="shop.php">Laminating (Ép nhựa)</a></li>
+          <li><a href="shop.php">Cung cấp sỉ văn phòng phẩm</a></li>
+          <li><a href="shop.php">Đặt hàng theo yêu cầu</a></li>
+          <li><a href="contact.php">Trung tâm hỗ trợ</a></li>
         </ul>
       </div>
     </div>
