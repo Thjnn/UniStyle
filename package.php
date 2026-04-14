@@ -1,51 +1,69 @@
 <?php
 session_start();
+$totalQty = 0;
 
-// XÓA SẢN PHẨM
-if (isset($_GET['del'])) {
-    $index = $_GET['del'];
-    unset($_SESSION['cart'][$index]);
-    $_SESSION['cart'] = array_values($_SESSION['cart']);
-}
-
-// TĂNG GIẢM SỐ LƯỢNG
-if (isset($_GET['action']) && isset($_GET['index'])) {
-    $i = $_GET['index'];
-
-    if ($_GET['action'] == "plus") {
-        $_SESSION['cart'][$i]['soluong']++;
-    }
-
-    if ($_GET['action'] == "minus") {
-        $_SESSION['cart'][$i]['soluong']--;
-        if ($_SESSION['cart'][$i]['soluong'] <= 0) {
-            unset($_SESSION['cart'][$i]);
-            $_SESSION['cart'] = array_values($_SESSION['cart']);
-        }
+if (!empty($_SESSION['cart'])) {
+    foreach ($_SESSION['cart'] as $item) {
+        $totalQty += $item['soluong'];
     }
 }
-
 include("./config/db.php");
 
-$madanhmuc = 0;
+// 1. XÓA SẢN PHẨM (Nên dùng POST để bảo mật hơn, nhưng giữ GET theo ý bạn)
+if (isset($_GET['del'])) {
+    $index = (int)$_GET['del']; // Ép kiểu số nguyên để an toàn
+    if (isset($_SESSION['cart'][$index])) {
+        unset($_SESSION['cart'][$index]);
+        $_SESSION['cart'] = array_values($_SESSION['cart']);
+    }
+    header("Location: package.php"); // Chuyển hướng để tránh lặp lại hành động khi F5
+    exit();
+}
 
-// lấy danh mục từ sản phẩm đầu tiên trong giỏ
+// 2. TĂNG GIẢM SỐ LƯỢNG
+if (isset($_GET['action']) && isset($_GET['index'])) {
+    $i = (int)$_GET['index'];
+    if (isset($_SESSION['cart'][$i])) {
+        if ($_GET['action'] == "plus") {
+            $_SESSION['cart'][$i]['soluong']++;
+        } elseif ($_GET['action'] == "minus") {
+            $_SESSION['cart'][$i]['soluong']--;
+            if ($_SESSION['cart'][$i]['soluong'] <= 0) {
+                unset($_SESSION['cart'][$i]);
+                $_SESSION['cart'] = array_values($_SESSION['cart']);
+            }
+        }
+    }
+    header("Location: package.php");
+    exit();
+}
+
+$madanhmuc = 0;
+$result_lq = null; // Khởi tạo mặc định
+
+// 3. LẤY DANH MỤC TỪ GIỎ HÀNG
 if (!empty($_SESSION['cart'])) {
-    $masp = $_SESSION['cart'][0]['masp'];
+    // Lấy phần tử đầu tiên một cách an toàn dù key là gì
+    $firstItem = reset($_SESSION['cart']);
+    $masp = (int)($firstItem['masp'] ?? 0);
 
     $sql_dm = "SELECT madanhmuc FROM sanpham WHERE MaSP = $masp";
     $res_dm = mysqli_query($conn, $sql_dm);
-    $row_dm = mysqli_fetch_assoc($res_dm);
 
-    $madanhmuc = $row_dm['madanhmuc'];
+    if ($res_dm && mysqli_num_rows($res_dm) > 0) {
+        $row_dm = mysqli_fetch_assoc($res_dm);
+        $madanhmuc = (int)$row_dm['madanhmuc'];
+    }
 }
 
-// lấy sản phẩm cùng loại
-$sql_lq = "SELECT * FROM sanpham 
-           WHERE madanhmuc = $madanhmuc 
-           LIMIT 5";
-
-$result_lq = mysqli_query($conn, $sql_lq);
+// 4. LẤY SẢN PHẨM CÙNG LOẠI (Chỉ chạy khi có danh mục hợp lệ)
+if ($madanhmuc > 0) {
+    $sql_lq = "SELECT * FROM sanpham 
+               WHERE madanhmuc = $madanhmuc 
+               AND MaSP != $masp 
+               LIMIT 5"; // Thêm điều kiện loại trừ sản phẩm hiện tại
+    $result_lq = mysqli_query($conn, $sql_lq);
+}
 ?>
 
 
@@ -104,7 +122,15 @@ $result_lq = mysqli_query($conn, $sql_lq);
                                 placeholder="Tìm sản phẩm..." />
                         </form>
                     </div>
-                    <a href="package.php"><span class="material-symbols-outlined"> local_mall </span></a>
+                    <div class="cart-icon">
+                        <a href="package.php">
+                            <span class="material-symbols-outlined">local_mall</span>
+
+                            <?php if ($totalQty > 0): ?>
+                                <span class="cart-count"><?= $totalQty ?></span>
+                            <?php endif; ?>
+                        </a>
+                    </div>
                     <?php
                     if (isset($_SESSION['khachhang_id'])) {
                         echo '<a href="profile.php"><span class="material-symbols-outlined"> person </span></a>';
@@ -243,34 +269,37 @@ $result_lq = mysqli_query($conn, $sql_lq);
 
         <div class="product-grid">
 
-            <?php while ($sp = mysqli_fetch_assoc($result_lq)) { ?>
+            <?php if ($result_lq && mysqli_num_rows($result_lq) > 0): ?>
+                <?php while ($sp = mysqli_fetch_assoc($result_lq)): ?>
+                    <div class="product-card">
+                        <div class="product-img">
+                            <img src="assets/file_anh/San_Pham/<?php echo $sp['Hinh']; ?>" />
+                        </div>
 
-                <div class="product-card">
-                    <div class="product-img">
-                        <img src="assets/file_anh/San_Pham/<?php echo $sp['Hinh']; ?>" />
+                        <div class="product-info">
+                            <div class="product-tag">
+                                <span class="new">👍 New</span>
+                            </div>
+
+                            <h3 class="product-name">
+                                <?php echo $sp['TenSP']; ?>
+                            </h3>
+
+                            <div class="price">
+                                <?php echo number_format($sp['GiaBan']); ?>đ
+                            </div>
+
+                            <div class="old-price">
+                                <?php echo number_format($sp['GiaBan'] * 1.3); ?>đ
+                                <span class="discount">-30%</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="product-info">
-                        <div class="product-tag">
-                            <span class="new">👍 New</span>
-                        </div>
-
-                        <h3 class="product-name">
-                            <?php echo $sp['TenSP']; ?>
-                        </h3>
-
-                        <div class="price">
-                            <?php echo number_format($sp['GiaBan']); ?>đ
-                        </div>
-
-                        <div class="old-price">
-                            <?php echo number_format($sp['GiaBan'] * 1.3); ?>đ
-                            <span class="discount">-30%</span>
-                        </div>
-                    </div>
-                </div>
-
-            <?php } ?>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <p>Không có sản phẩm cùng loại nào.</p>
+            <?php endif; ?>
 
         </div>
     </section>

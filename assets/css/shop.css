@@ -3,7 +3,9 @@
   padding: 0;
   box-sizing: border-box;
 }
-
+a {
+  text-decoration: none !important;
+}
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background-color: #fff8f8;
@@ -124,6 +126,20 @@ nav a:hover {
 /* khi mở */
 .search-box.active .search-form {
   width: 200px;
+}
+.cart-icon {
+  position: relative;
+}
+
+.cart-count {
+  position: absolute;
+  top: -6px;
+  right: -10px;
+  background: red;
+  color: white;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 50%;
 }
 
 /* ============ MOBILE MENU ============ */
@@ -392,6 +408,52 @@ nav a:hover {
 .see-more-categories button.active i {
   transform: rotate(180deg);
 }
+/* Khung bao bọc để xác định phạm vi nền */
+.moving-bg-wrapper {
+  position: relative;
+  overflow: hidden; /* Cắt bỏ phần nền thừa khi trôi */
+  padding-bottom: 50px; /* Khoảng cách nếu cần */
+}
+
+.background-move {
+  /* Trải dài toàn bộ khung bao */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%; /* Chiều rộng gấp đôi để lặp lại không bị hụt */
+  height: 80%;
+
+  /* Link ảnh Pinterest của bạn */
+  background-image: url("https://i.pinimg.com/1200x/35/cf/0f/35cf0f34ba9669e6e90086e9548d6d02.jpg");
+  background-repeat: repeat-x;
+  background-size: 600px; /* Điều chỉnh kích thước icon to hay nhỏ ở đây */
+
+  /* Quan trọng: Để nền nằm dưới cùng và mờ nhẹ cho sang */
+  opacity: 0.08;
+  z-index: 0;
+  pointer-events: none; /* Để người dùng vẫn click được vào sản phẩm */
+
+  /* Kích hoạt chuyển động */
+  animation: moveLeft 40s linear infinite;
+}
+
+/* Định nghĩa chuyển động trôi từ phải qua trái */
+@keyframes moveLeft {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Đảm bảo nội dung của 2 section nằm trên nền */
+.section,
+.promo-section {
+  position: relative;
+  z-index: 1;
+  background: transparent !important; /* Xóa bỏ màu nền cũ nếu có */
+}
 /* shop */
 .shop-page {
   padding: 30px;
@@ -399,25 +461,32 @@ nav a:hover {
   margin: 0 auto;
 }
 
+/* Tìm và sửa trong shop.css */
 .shop-container {
   display: grid;
   grid-template-columns: 260px 1fr;
   gap: 30px;
-  background-color: #4b9cf2;
   padding: 20px;
+  align-items: start;
+  background-color: #4b9cf2;
+}
+.shop-content {
+  padding: 20px;
+  border-radius: 12px;
 }
 
 /* Sidebar */
 
+/* Tìm và sửa trong shop.css */
 .shop-sidebar {
   background: white;
   padding: 20px;
   border-radius: 12px;
-
   position: sticky;
-  top: 15%;
-  height: 100vh; /* full chiều cao */
-  overflow-y: auto; /* nếu filter dài thì cuộn riêng */
+  top: 15%; /* Vị trí hít khi cuộn trang */
+  height: auto; /* Để chiều cao tự động theo nội dung filter */
+  max-height: 80vh; /* Giới hạn chiều cao tối đa để không tràn màn hình */
+  overflow-y: auto; /* Nếu filter quá dài sẽ xuất hiện thanh cuộn riêng trong sidebar */
 }
 
 .filter-group {
@@ -546,7 +615,7 @@ nav a:hover {
 
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 20px;
 }
 .product-card {

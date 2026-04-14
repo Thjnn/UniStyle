@@ -2,6 +2,7 @@
 session_start(); // 🔥 BẮT BUỘC
 require_once "./config/db.php";
 
+
 // 1. Khởi tạo mảng chứa các điều kiện lọc
 $conditions = [];
 
@@ -57,6 +58,12 @@ if (isset($_GET['category_id']) && $_GET['category_id'] != "") {
       // Ví dụ: $filters['mau'] = ['xanh', 'đỏ', 'đen']
       $filters[$row['LoaiThuocTinh']][] = $row['GiaTri'];
     }
+  }
+}
+$totalQty = 0;
+if (!empty($_SESSION['cart'])) {
+  foreach ($_SESSION['cart'] as $item) {
+    $totalQty += $item['soluong'];
   }
 }
 // ==========================================
@@ -124,7 +131,15 @@ if (isset($_GET['category_id']) && $_GET['category_id'] != "") {
                 placeholder="Tìm sản phẩm..." />
             </form>
           </div>
-          <a href="package.php"><span class="material-symbols-outlined"> local_mall </span></a>
+          <div class="cart-icon">
+            <a href="package.php">
+              <span class="material-symbols-outlined">local_mall</span>
+
+              <?php if ($totalQty > 0): ?>
+                <span class="cart-count"><?= $totalQty ?></span>
+              <?php endif; ?>
+            </a>
+          </div>
           <?php
           if (isset($_SESSION['khachhang_id'])) {
             echo '<a href="profile.php"><span class="material-symbols-outlined"> person </span></a>';
@@ -206,241 +221,249 @@ if (isset($_GET['category_id']) && $_GET['category_id'] != "") {
     });
   </script>
   <!-- main content -->
-  <section class="shop-page">
-    <!-- Featured Categories -->
-    <section class="section">
-      <div class="categories-grid" id="categoriesGrid">
+  <div class="moving-bg-wrapper">
+    <div class="background-move"></div>
+    <section class="shop-page">
+      <!-- Featured Categories -->
+      <section class="section">
+        <div class="categories-grid" id="categoriesGrid">
+          <?php
+          $sql_dm = "SELECT * FROM danhmuc ORDER BY madanhmuc ASC";
+          $result_dm = mysqli_query($conn, $sql_dm);
+          $count = 0;
+
+          if ($result_dm && mysqli_num_rows($result_dm) > 0) {
+            while ($dm = mysqli_fetch_assoc($result_dm)) {
+              $count++;
+
+              $hidden_class = ($count > 8) ? 'hidden-category' : '';
+
+              $id_dm = $dm['madanhmuc'];
+              $ten_dm = $dm['tendanhmuc'];
+              $file_anh = $dm['hinhanh'];
+
+              // ✅ CHECK đang chọn danh mục
+              $active = (isset($_GET['category_id']) && $_GET['category_id'] == $id_dm) ? 'active-category' : '';
+          ?>
+              <div class="category-card <?= $hidden_class ?> <?= $active ?>">
+                <a href="<?= (isset($_GET['category_id']) && $_GET['category_id'] == $id_dm)
+                            ? 'shop.php'
+                            : 'shop.php?category_id=' . $id_dm ?>"
+                  class="category-link">
+                  <div class="category-icon">
+                    <img src="./assets/file_anh/San_Pham/<?= $file_anh ?>" alt="<?= $ten_dm ?>" />
+                  </div>
+                  <div class="category-name"><?= $ten_dm ?></div>
+                </a>
+              </div>
+          <?php
+            }
+          }
+          ?>
+        </div>
+
+        <?php if ($result_dm && mysqli_num_rows($result_dm) > 8): ?>
+          <div class="see-more-categories">
+            <button id="toggleCategoriesBtn" onclick="toggleCategories()">
+              Xem thêm <i class="fa-solid fa-chevron-down"></i>
+            </button>
+          </div>
+        <?php endif; ?>
+      </section>
+  </div>
+  <div class="shop-container">
+    <!-- Sidebar -->
+    <aside class="shop-sidebar">
+      <form action="shop.php" method="GET">
+        <input type="hidden" name="category_id" value="<?= $category_id ?>">
+
+        <div class="filter-section">
+          <h4>MỨC GIÁ</h4>
+
+          <label>
+            <input type="radio" name="price" value="duoi_100" <?= (isset($_GET['price']) && $_GET['price'] == 'duoi_100') ? 'checked' : '' ?>>
+            Dưới 100.000đ
+          </label><br>
+
+          <label>
+            <input type="radio" name="price" value="100_300" <?= (isset($_GET['price']) && $_GET['price'] == '100_300') ? 'checked' : '' ?>>
+            100.000đ - 300.000đ
+          </label><br>
+
+          <label>
+            <input type="radio" name="price" value="300_500" <?= (isset($_GET['price']) && $_GET['price'] == '300_500') ? 'checked' : '' ?>>
+            300.000đ - 500.000đ
+          </label><br>
+
+          <label>
+            <input type="radio" name="price" value="tren_500" <?= (isset($_GET['price']) && $_GET['price'] == 'tren_500') ? 'checked' : '' ?>>
+            Trên 500.000đ
+          </label><br>
+
+          <label>
+            <input type="radio" name="price" value="" <?= (!isset($_GET['price']) || $_GET['price'] == '') ? 'checked' : '' ?>>
+            Tất cả mức giá
+          </label>
+        </div>
+
+        <?php foreach ($filters as $loai => $values): ?>
+          <div class="filter-section">
+            <h4><?= strtoupper($loai) ?></h4>
+            <?php foreach ($values as $v): ?>
+              <label>
+                <input type="checkbox" name="attr[<?= $loai ?>][]" value="<?= $v ?>"> <?= $v ?>
+              </label><br>
+            <?php endforeach; ?>
+          </div>
+        <?php endforeach; ?>
+
+        <button type="submit" class="btn-filter">Áp dụng</button>
+      </form>
+    </aside>
+
+    <!-- Content -->
+    <div class="shop-content">
+      <!-- Banner -->
+      <div class="shop-banner">
+        <img
+          src="./assets/file_anh/1920_x_600___cta__1_d652d361086646d3b12a89b38ce6c294.jpg" />
+      </div>
+
+      <!-- Title + Sort -->
+      <div class="shop-header">
+        <h2>Cửa hàng</h2>
+
+        <div class="shop-actions">
+          <select class="sort-select">
+            <option>Tên A → Z</option>
+            <option>Tên Z → A</option>
+            <option selected>Giá tăng dần</option>
+            <option>Giá giảm dần</option>
+            <option>Hàng mới</option>
+          </select>
+
+          <button class="filter-btn" onclick="openFilter()">
+            <i class="fa-solid fa-filter"></i> Lọc
+          </button>
+        </div>
+      </div>
+
+      <!-- Product grid -->
+      <div class="product-grid">
         <?php
-        $sql_dm = "SELECT * FROM danhmuc ORDER BY madanhmuc ASC";
-        $result_dm = mysqli_query($conn, $sql_dm);
-        $count = 0;
 
-        if ($result_dm && mysqli_num_rows($result_dm) > 0) {
-          while ($dm = mysqli_fetch_assoc($result_dm)) {
-            $count++;
+        if ($result_product && mysqli_num_rows($result_product) > 0) {
 
-            $hidden_class = ($count > 8) ? 'hidden-category' : '';
+          while ($sp = mysqli_fetch_assoc($result_product)) {
 
-            $id_dm = $dm['madanhmuc'];
-            $ten_dm = $dm['tendanhmuc'];
-            $file_anh = $dm['hinhanh'];
-
-            // ✅ CHECK đang chọn danh mục
-            $active = (isset($_GET['category_id']) && $_GET['category_id'] == $id_dm) ? 'active-category' : '';
+            // 🔥 LẤY THÊM MÃ SẢN PHẨM Ở ĐÂY
+            $ma_sp    = $sp['MaSP'];
+            $ten_sp   = $sp['TenSP'];
+            $gia_ban  = $sp['GiaBan'];
+            $hinh_anh = $sp['Hinh'];
+            $da_ban   = $sp['SoLuongDaBan'];
+            $rating   = $sp['Rating'];
+            $is_new   = $sp['NoiBat'];
+            $so_luot_dg = $sp['SoLuotDanhGia'];
         ?>
-            <div class="category-card <?= $hidden_class ?> <?= $active ?>">
-              <a href="<?= (isset($_GET['category_id']) && $_GET['category_id'] == $id_dm)
-                          ? 'shop.php'
-                          : 'shop.php?category_id=' . $id_dm ?>"
-                class="category-link">
-                <div class="category-icon">
-                  <img src="./assets/file_anh/San_Pham/<?= $file_anh ?>" alt="<?= $ten_dm ?>" />
+            <a href="product-detail.php?id=<?= $ma_sp ?>" style="text-decoration: none; color: inherit; display: block;">
+              <div class="product-card">
+                <div class="product-img">
+                  <img src="./assets/file_anh/San_Pham/<?= !empty($hinh_anh) ? $hinh_anh : 'default.png' ?>" />
                 </div>
-                <div class="category-name"><?= $ten_dm ?></div>
-              </a>
-            </div>
+
+                <div class="product-info">
+                  <div class="product-tag">
+                    <?php if ($is_new == 1): ?>
+                      <span class="new">👍 Hot</span>
+                    <?php endif; ?>
+                    <span class="sold">📊 Đã bán <?= $da_ban ?></span>
+                  </div>
+
+                  <h3 class="product-name"><?= $ten_sp ?></h3>
+
+                  <div class="rating">
+                    <?php
+                    for ($i = 1; $i <= 5; $i++) {
+                      echo ($i <= $rating)
+                        ? '<i class="fa-solid fa-star" style="color:#ffc107;"></i>'
+                        : '<i class="fa-regular fa-star" style="color:#ccc;"></i>';
+                    }
+                    ?>
+                    <span>(<?= $so_luot_dg ?>)</span>
+                  </div>
+
+                  <div class="price"><?= number_format($gia_ban, 0, ',', '.') ?>đ</div>
+                </div>
+              </div>
+            </a>
         <?php
           }
+        } else {
+          echo "<p>Không có sản phẩm</p>";
         }
         ?>
       </div>
+      <button id="loadMoreBtn">Xem thêm</button>
+      <script>
+        const items = document.querySelectorAll(".product-grid > a");
+        const loadMoreBtn = document.getElementById("loadMoreBtn");
 
-      <?php if ($result_dm && mysqli_num_rows($result_dm) > 8): ?>
-        <div class="see-more-categories">
-          <button id="toggleCategoriesBtn" onclick="toggleCategories()">
-            Xem thêm <i class="fa-solid fa-chevron-down"></i>
-          </button>
-        </div>
-      <?php endif; ?>
-    </section>
-    <div class="shop-container">
-      <!-- Sidebar -->
-      <aside class="shop-sidebar">
-        <form action="shop.php" method="GET">
-          <input type="hidden" name="category_id" value="<?= $category_id ?>">
+        let visible = 8;
 
-          <div class="filter-section">
-            <h4>MỨC GIÁ</h4>
-
-            <label>
-              <input type="radio" name="price" value="duoi_100" <?= (isset($_GET['price']) && $_GET['price'] == 'duoi_100') ? 'checked' : '' ?>>
-              Dưới 100.000đ
-            </label><br>
-
-            <label>
-              <input type="radio" name="price" value="100_300" <?= (isset($_GET['price']) && $_GET['price'] == '100_300') ? 'checked' : '' ?>>
-              100.000đ - 300.000đ
-            </label><br>
-
-            <label>
-              <input type="radio" name="price" value="300_500" <?= (isset($_GET['price']) && $_GET['price'] == '300_500') ? 'checked' : '' ?>>
-              300.000đ - 500.000đ
-            </label><br>
-
-            <label>
-              <input type="radio" name="price" value="tren_500" <?= (isset($_GET['price']) && $_GET['price'] == 'tren_500') ? 'checked' : '' ?>>
-              Trên 500.000đ
-            </label><br>
-
-            <label>
-              <input type="radio" name="price" value="" <?= (!isset($_GET['price']) || $_GET['price'] == '') ? 'checked' : '' ?>>
-              Tất cả mức giá
-            </label>
-          </div>
-
-          <?php foreach ($filters as $loai => $values): ?>
-            <div class="filter-section">
-              <h4><?= strtoupper($loai) ?></h4>
-              <?php foreach ($values as $v): ?>
-                <label>
-                  <input type="checkbox" name="attr[<?= $loai ?>][]" value="<?= $v ?>"> <?= $v ?>
-                </label><br>
-              <?php endforeach; ?>
-            </div>
-          <?php endforeach; ?>
-
-          <button type="submit" class="btn-filter">Áp dụng</button>
-        </form>
-      </aside>
-
-      <!-- Content -->
-      <div class="shop-content">
-        <!-- Banner -->
-        <div class="shop-banner">
-          <img
-            src="./assets/file_anh/1920_x_600___cta__1_d652d361086646d3b12a89b38ce6c294.jpg" />
-        </div>
-
-        <!-- Title + Sort -->
-        <div class="shop-header">
-          <h2>Cửa hàng</h2>
-
-          <div class="shop-actions">
-            <select class="sort-select">
-              <option>Tên A → Z</option>
-              <option>Tên Z → A</option>
-              <option selected>Giá tăng dần</option>
-              <option>Giá giảm dần</option>
-              <option>Hàng mới</option>
-            </select>
-
-            <button class="filter-btn" onclick="openFilter()">
-              <i class="fa-solid fa-filter"></i> Lọc
-            </button>
-          </div>
-        </div>
-
-        <!-- Product grid -->
-        <div class="product-grid">
-          <?php
-
-          if ($result_product && mysqli_num_rows($result_product) > 0) {
-
-            while ($sp = mysqli_fetch_assoc($result_product)) {
-
-              // 🔥 LẤY THÊM MÃ SẢN PHẨM Ở ĐÂY
-              $ma_sp    = $sp['MaSP'];
-              $ten_sp   = $sp['TenSP'];
-              $gia_ban  = $sp['GiaBan'];
-              $hinh_anh = $sp['Hinh'];
-              $da_ban   = $sp['SoLuongDaBan'];
-              $rating   = $sp['Rating'];
-              $is_new   = $sp['NoiBat'];
-              $so_luot_dg = $sp['SoLuotDanhGia'];
-          ?>
-              <a href="product-detail.php?id=<?= $ma_sp ?>" style="text-decoration: none; color: inherit; display: block;">
-                <div class="product-card">
-                  <div class="product-img">
-                    <img src="./assets/file_anh/San_Pham/<?= !empty($hinh_anh) ? $hinh_anh : 'default.png' ?>" />
-                  </div>
-
-                  <div class="product-info">
-                    <div class="product-tag">
-                      <?php if ($is_new == 1): ?>
-                        <span class="new">👍 Hot</span>
-                      <?php endif; ?>
-                      <span class="sold">📊 Đã bán <?= $da_ban ?></span>
-                    </div>
-
-                    <h3 class="product-name"><?= $ten_sp ?></h3>
-
-                    <div class="rating">
-                      <?php
-                      for ($i = 1; $i <= 5; $i++) {
-                        echo ($i <= $rating)
-                          ? '<i class="fa-solid fa-star" style="color:#ffc107;"></i>'
-                          : '<i class="fa-regular fa-star" style="color:#ccc;"></i>';
-                      }
-                      ?>
-                      <span>(<?= $so_luot_dg ?>)</span>
-                    </div>
-
-                    <div class="price"><?= number_format($gia_ban, 0, ',', '.') ?>đ</div>
-                  </div>
-                </div>
-              </a>
-          <?php
-            }
-          } else {
-            echo "<p>Không có sản phẩm</p>";
-          }
-          ?>
-        </div>
-        <button id="loadMoreBtn">Xem thêm</button>
-        <script>
-          const items = document.querySelectorAll(".product-card");
-          const loadMoreBtn = document.getElementById("loadMoreBtn");
-
-          let visible = 8;
-
-          function showItems() {
-            items.forEach((item, index) => {
-              item.style.display = index < visible ? "block" : "none";
-            });
-
-            if (visible >= items.length) {
-              btn.style.display = "none";
-            }
-          }
-
-          loadMoreBtn.addEventListener("click", () => {
-            visible += 8;
-            showItems();
+        function showItems() {
+          items.forEach((item, index) => {
+            item.style.display = index < visible ? "block" : "none";
           });
 
+          if (visible >= items.length) {
+            loadMoreBtn.style.display = "none";
+          }
+        }
+
+        loadMoreBtn.addEventListener("click", () => {
+          visible += 8;
           showItems();
-        </script>
+        });
+        if (visible >= items.length) {
+          loadMoreBtn.style.display = "none"; // Sửa 'btn' thành 'loadMoreBtn'
+        }
+
+        showItems();
+      </script>
+
+    </div>
+  </div>
+  <!-- HTML Filter Overlay (mobile) -->
+  <div class="filter-overlay" id="filterOverlay">
+    <div class="filter-panel">
+      <div class="filter-header">
+        <h3>Bộ lọc</h3>
+        <span onclick="closeFilter()">✕</span>
+      </div>
+
+      <!-- copy toàn bộ filter sidebar vào đây -->
+
+      <div class="filter-group">
+        <h3>LOẠI SẢN PHẨM</h3>
+
+        <label><input type="checkbox" /> Bảng học sinh</label>
+        <label><input type="checkbox" /> Kéo học sinh</label>
+        <label><input type="checkbox" /> Gôm</label>
+        <label><input type="checkbox" /> Bìa bao tập</label>
+      </div>
+
+      <div class="filter-group">
+        <h3>THƯƠNG HIỆU</h3>
+
+        <label><input type="checkbox" /> Bizner</label>
+        <label><input type="checkbox" /> Flexoffice</label>
+        <label><input type="checkbox" /> Colokit</label>
       </div>
     </div>
-    <!-- HTML Filter Overlay (mobile) -->
-    <div class="filter-overlay" id="filterOverlay">
-      <div class="filter-panel">
-        <div class="filter-header">
-          <h3>Bộ lọc</h3>
-          <span onclick="closeFilter()">✕</span>
-        </div>
-
-        <!-- copy toàn bộ filter sidebar vào đây -->
-
-        <div class="filter-group">
-          <h3>LOẠI SẢN PHẨM</h3>
-
-          <label><input type="checkbox" /> Bảng học sinh</label>
-          <label><input type="checkbox" /> Kéo học sinh</label>
-          <label><input type="checkbox" /> Gôm</label>
-          <label><input type="checkbox" /> Bìa bao tập</label>
-        </div>
-
-        <div class="filter-group">
-          <h3>THƯƠNG HIỆU</h3>
-
-          <label><input type="checkbox" /> Bizner</label>
-          <label><input type="checkbox" /> Flexoffice</label>
-          <label><input type="checkbox" /> Colokit</label>
-        </div>
-      </div>
-    </div>
+  </div>
   </section>
+
   <!-- Back to Top -->
   <button id="backToTop">
     <span class="material-symbols-outlined"> keyboard_arrow_up </span>

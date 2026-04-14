@@ -1,0 +1,29 @@
+.background-move {
+  /* Cố định nó làm nền */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 200%; /* Cho chiều dài gấp đôi màn hình để lặp lại mượt */
+  height: 100vh;
+
+  /* Chèn link ảnh Pinterest của bạn vào đây */
+  background-image: url("https://i.pinimg.com/1200x/35/cf/0f/35cf0f34ba9669e6e90086e9548d6d02.jpg");
+  background-repeat: repeat-x; /* Lặp lại theo chiều ngang */
+  background-size: contain; /* Hoặc để 'auto' tùy bạn muốn to hay nhỏ */
+
+  /* Giảm độ đậm để không bị chói mắt (giống Thiên Long) */
+  opacity: 0.1;
+  z-index: -1;
+
+  /* Lệnh cho nó di chuyển */
+  animation: moveLeft 60s linear infinite;
+}
+
+@keyframes moveLeft {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%); /* Chạy một nửa quãng đường là đủ để lặp lại */
+  }
+}

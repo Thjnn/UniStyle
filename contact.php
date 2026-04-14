@@ -1,3 +1,14 @@
+<?php
+include("session.php");
+
+include("./config/db.php");
+$totalQty = 0;
+if (!empty($_SESSION['cart'])) {
+  foreach ($_SESSION['cart'] as $item) {
+    $totalQty += $item['soluong'];
+  }
+}
+?>
 <!doctype html>
 <html lang="en">
 
@@ -19,6 +30,8 @@
     href="assets/file_anh/0c4690d7-3599-4de4-a0a4-841817ead1c0.png" />
   <!-- css -->
   <link rel="stylesheet" href="./assets/css/contact.css" />
+  <link rel="stylesheet" href="./assets/css/style.css" />
+
   <!-- repo -->
   <link rel="stylesheet" href="./assets/css/reposive.css" />
   <!-- script -->
@@ -41,7 +54,46 @@
         <nav>
           <ul>
             <li><a href="index.php">Trang chủ</a></li>
-            <li><a href="shop.php">Cửa hàng</a></li>
+
+            <li class="has-submenu">
+              <a href="shop.php">Cửa hàng</a>
+
+              <div class="submenu">
+                <!-- LEFT: danh mục -->
+                <div class="submenu-left">
+                  <div class="submenu-column">
+                    <h4>Bút viết</h4>
+                    <a href="#">Bút bi</a>
+                    <a href="#">Bút màu</a>
+                    <a href="#">Bút dạ quang</a>
+                  </div>
+
+                  <div class="submenu-column">
+                    <h4>Văn phòng phẩm</h4>
+                    <a href="#">Sổ</a>
+                    <a href="#">Bìa hồ sơ</a>
+                    <a href="#">Dập ghim</a>
+                    <a href="#">Băng keo</a>
+                  </div>
+
+                  <div class="submenu-column">
+                    <h4>Dụng cụ học tập</h4>
+                    <a href="#">Thước</a>
+                    <a href="#">Máy tính</a>
+                    <a href="#">Dao rọc giấy</a>
+                  </div>
+                </div>
+
+                <!-- RIGHT: banner -->
+                <div class="submenu-banner">
+                  <a href="#!">
+                    <img
+                      src="./assets/file_anh/1920_x_600___cta___6_.webp"
+                      alt="Back To School Sale" />
+                  </a>
+                </div>
+              </div>
+            </li>
             <li><a href="contact.php">Liên hệ</a></li>
             <li><a href="FAQ.php">FAQ</a></li>
             <li><a href="aboutus.php">Về chúng tôi</a></li>
@@ -58,7 +110,16 @@
                 placeholder="Tìm sản phẩm..." />
             </form>
           </div>
-          <a href="package.php"><span class="material-symbols-outlined"> local_mall </span></a>
+          <div class="cart-icon">
+            <a href="package.php">
+              <span class="material-symbols-outlined">local_mall</span>
+
+              <?php if ($totalQty > 0): ?>
+                <span class="cart-count"><?= $totalQty ?></span>
+              <?php endif; ?>
+            </a>
+          </div>
+
           <?php
           if (isset($_SESSION['khachhang_id'])) {
             echo '<a href="profile.php"><span class="material-symbols-outlined"> person </span></a>';

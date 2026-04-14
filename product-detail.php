@@ -70,6 +70,12 @@ if (isset($_POST['buyNow'])) {
     header("Location: package.php");
     exit();
 }
+$totalQty = 0;
+if (!empty($_SESSION['cart'])) {
+    foreach ($_SESSION['cart'] as $item) {
+        $totalQty += $item['soluong'];
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -77,6 +83,10 @@ if (isset($_POST['buyNow'])) {
 <head>
     <meta charset="UTF-8">
     <title><?php echo $sp['TenSP']; ?></title>
+    <!-- logo web -->
+    <link
+        rel="shortcut icon"
+        href="assets/file_anh/0c4690d7-3599-4de4-a0a4-841817ead1c0.png" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="./assets/css/product-detail.css">
     <link rel="stylesheet" href="./assets/css/responsive.css" />
@@ -136,7 +146,15 @@ if (isset($_POST['buyNow'])) {
                                 placeholder="Tìm sản phẩm..." />
                         </form>
                     </div>
-                    <a href="package.php"><span class="material-symbols-outlined"> local_mall </span></a>
+                    <div class="cart-icon">
+                        <a href="package.php">
+                            <span class="material-symbols-outlined">local_mall</span>
+
+                            <?php if ($totalQty > 0): ?>
+                                <span class="cart-count"><?= $totalQty ?></span>
+                            <?php endif; ?>
+                        </a>
+                    </div>
                     <?php
                     if (isset($_SESSION['khachhang_id'])) {
                         echo '<a href="profile.php"><span class="material-symbols-outlined"> person </span></a>';

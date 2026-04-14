@@ -1,5 +1,5 @@
 <?php
-session_start(); // 🔥 BẮT BUỘC
+include("session.php");
 
 include("./config/db.php");
 
@@ -8,7 +8,16 @@ $result = mysqli_query($conn, $sql);
 
 $sql_sp = "SELECT * FROM sanpham WHERE NoiBat = 1 LIMIT 8";
 $result_sp = mysqli_query($conn, $sql_sp);
+
+$totalQty = 0;
+if (!empty($_SESSION['cart'])) {
+  foreach ($_SESSION['cart'] as $item) {
+    $totalQty += $item['soluong'];
+  }
+}
+
 ?>
+
 
 <!doctype html>
 <html lang="en">
@@ -109,7 +118,15 @@ $result_sp = mysqli_query($conn, $sql_sp);
                 placeholder="Tìm sản phẩm..." />
             </form>
           </div>
-          <a href="package.php"><span class="material-symbols-outlined"> local_mall </span></a>
+          <div class="cart-icon">
+            <a href="package.php">
+              <span class="material-symbols-outlined">local_mall</span>
+
+              <?php if ($totalQty > 0): ?>
+                <span class="cart-count"><?= $totalQty ?></span>
+              <?php endif; ?>
+            </a>
+          </div>
 
           <?php
           if (isset($_SESSION['khachhang_id'])) {
@@ -207,35 +224,38 @@ $result_sp = mysqli_query($conn, $sql_sp);
           alt="" />
       </div>
     </section>
-    <!-- Featured Categories -->
-    <section class="section">
-      <div class="section-header">
-        <h2 class="section-title">
-          <span class="featured">Danh Mục</span> Nổi Bật
-        </h2>
-        <a href="shop.php" class="view-all">Xem thêm danh mục →</a>
-      </div>
+    <div class="moving-bg-wrapper">
+      <div class="background-move"></div>
+      <!-- Featured Categories -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span class="featured">Danh Mục</span> Nổi Bật
+          </h2>
+          <a href="shop.php" class="view-all">Xem thêm danh mục →</a>
+        </div>
 
-      <div class="categories-grid">
+        <div class="categories-grid">
 
-        <?php while ($row = mysqli_fetch_assoc($result)) { ?>
+          <?php while ($row = mysqli_fetch_assoc($result)) { ?>
 
-          <a href="shop.php?category_id=<?= $row['madanhmuc'] ?>" class="category-card">
+            <a href="shop.php?category_id=<?= $row['madanhmuc'] ?>" class="category-card">
 
-            <div class="category-icon">
-              <img src="./assets/file_anh/San_Pham/<?= $row['hinhanh'] ?>" alt="" />
-            </div>
+              <div class="category-icon">
+                <img src="./assets/file_anh/San_Pham/<?= $row['hinhanh'] ?>" alt="" />
+              </div>
 
-            <div class="category-name">
-              <?= $row['tendanhmuc'] ?>
-            </div>
+              <div class="category-name">
+                <?= $row['tendanhmuc'] ?>
+              </div>
 
-          </a>
+            </a>
 
-        <?php } ?>
+          <?php } ?>
 
-      </div>
-    </section>
+        </div>
+      </section>
+    </div>
     <!-- Promo Cards Section -->
     <section class="promo-section">
       <div class="promo-grid">
@@ -274,6 +294,7 @@ $result_sp = mysqli_query($conn, $sql_sp);
         </div>
       </div>
     </section>
+
     <!-- Featured Products -->
     <section class="section">
       <div class="section-header">
@@ -482,79 +503,81 @@ $result_sp = mysqli_query($conn, $sql_sp);
     <!-- News -->
     <section class="news-section">
       <div class="news-container">
-        <!-- Bài viết lớn -->
+
         <div class="news-feature">
-          <a href=""><img src="./assets/file_anh/businesswoman-planning-work_a8bb09d0b76c4c7e972d46e4c2500c4f.png" alt="" /></a>
+          <a href="news_top5but.php"><img src="./assets/file_anh/businesswoman-planning-work_a8bb09d0b76c4c7e972d46e4c2500c4f.png" alt="" /></a>
 
           <div class="news-feature-content">
-            <h2>Top 5 dòng bút văn phòng ngòi to viết đẹp</h2>
+            <h2><a href="news_top5but.php" style="text-decoration: none; color: inherit;">Top 5 dòng bút văn phòng ngòi to viết đẹp</a></h2>
             <span class="date">Thứ Tư 04/03/2026</span>
             <p>
               Trong môi trường văn phòng, một cây bút có ngòi to, mực ra đều
               sẽ giúp tốc độ...
-              <a href="#">Đọc tiếp</a>
+              <a href="news_top5but.php">Đọc tiếp</a>
             </p>
           </div>
         </div>
 
-        <!-- Danh sách tin -->
         <div class="news-list">
+
           <div class="news-item">
-            <a href=""><img src="./assets/file_anh/family-reunion-during-chinese-new-year-2026-01-05-05-45-10-utc_2ef835bd26794c7f9ea833af616f3784.png" alt="" /></a>
+            <a href="news_mauhopmenh.php"><img src="./assets/file_anh/family-reunion-during-chinese-new-year-2026-01-05-05-45-10-utc_2ef835bd26794c7f9ea833af616f3784.png" alt="" /></a>
             <div class="news-text">
-              <h4>Chọn màu hợp mệnh trong năm Bính Ngọ 2026</h4>
+              <h4><a href="news_mauhopmenh.php" style="text-decoration: none; color: inherit;">Chọn màu hợp mệnh trong năm Bính Ngọ 2026</a></h4>
               <span>Thứ Sáu 13/02/2026</span>
               <p>
-                Trong dòng chảy văn hoá Á Đông... <a href="#">Đọc tiếp</a>
+                Trong dòng chảy văn hoá Á Đông... <a href="news_mauhopmenh.php">Đọc tiếp</a>
               </p>
             </div>
           </div>
 
           <div class="news-item">
-            <a href=""><img src="./assets/file_anh/loseup-of-valentine-39-s-day-calendar-reminder-2025-02-09-22-57-20-utc_5ad22c8529364b45bf6f871166be1b3a.png" alt="" /></a>
+            <a href="news_valentine.php"><img src="./assets/file_anh/loseup-of-valentine-39-s-day-calendar-reminder-2025-02-09-22-57-20-utc_5ad22c8529364b45bf6f871166be1b3a.png" alt="" /></a>
             <div class="news-text">
-              <h4>Chọn quà Valentine như thế nào để duy trì mối quan hệ</h4>
+              <h4><a href="news_valentine.php" style="text-decoration: none; color: inherit;">Chọn quà Valentine như thế nào để duy trì mối quan hệ</a></h4>
               <span>Thứ Sáu 06/02/2026</span>
               <p>
-                Món quà Valentine nào cũng đẹp... <a href="#">Đọc tiếp</a>
+                Món quà Valentine nào cũng đẹp... <a href="news_valentine.php">Đọc tiếp</a>
               </p>
             </div>
           </div>
 
           <div class="news-item">
-            <a href=""><img src="./assets/file_anh/nhung_dieu_co_the_ban_chua_biet_ve_tet_binh_ngo_2026_2122e7c1466a4fe5858003daea41ae09.jpg" alt="" /></a>
+            <a href="news_tet2026.php"><img src="./assets/file_anh/nhung_dieu_co_the_ban_chua_biet_ve_tet_binh_ngo_2026_2122e7c1466a4fe5858003daea41ae09.jpg" alt="" /></a>
             <div class="news-text">
-              <h4>Những điều có thể bạn chưa biết về Tết Bính Ngọ 2026</h4>
+              <h4><a href="news_tet2026.php" style="text-decoration: none; color: inherit;">Những điều có thể bạn chưa biết về Tết Bính Ngọ 2026</a></h4>
               <span>Thứ Hai 05/01/2026</span>
               <p>
                 Tết Nguyên Đán là không chỉ là khoảnh khắc...
-                <a href="#">Đọc tiếp</a>
+                <a href="news_tet2026.php">Đọc tiếp</a>
               </p>
             </div>
           </div>
 
           <div class="news-item">
-            <a href=""><img src="./assets/file_anh/cute-little-kids-studying-in-a-group-2024-10-18-03-40-30-utc_9f0d248b36de4523b673935db27492db.png" alt="" /></a>
+            <a href="news_top5but_quickdry.php"><img src="./assets/file_anh/cute-little-kids-studying-in-a-group-2024-10-18-03-40-30-utc_9f0d248b36de4523b673935db27492db.png" alt="" /></a>
             <div class="news-text">
-              <h4>Top 5 dòng bút Quick Dry/Super Quick Dry dành cho bé</h4>
+              <h4><a href="news_top5but_quickdry.php" style="text-decoration: none; color: inherit;">Top 5 dòng bút Quick Dry/Super Quick Dry dành cho bé</a></h4>
               <span>Thứ Sáu 02/01/2026</span>
               <p>
                 Viết tay là một hành trình rèn luyện...
-                <a href="#">Đọc tiếp</a>
+                <a href="news_top5but_quickdry.php">Đọc tiếp</a>
               </p>
             </div>
           </div>
+
           <div class="news-item">
-            <a href=""><img src="./assets/file_anh/cute-little-kids-studying-in-a-group-2024-10-18-03-40-30-utc_9f0d248b36de4523b673935db27492db.png" alt="" /></a>
+            <a href="news_giangsinh.php"><img src="./assets/file_anh/noel.png" alt="Quà tặng Giáng sinh" /></a>
             <div class="news-text">
-              <h4>Top 5 dòng bút Quick Dry/Super Quick Dry dành cho bé</h4>
-              <span>Thứ Sáu 02/01/2026</span>
+              <h4><a href="news_giangsinh.php" style="text-decoration: none; color: inherit;">Quà tặng xu hướng “Edutainment” cho trẻ vào dịp Giáng sinh</a></h4>
+              <span>Thứ Năm 17/12/2026</span>
               <p>
-                Viết tay là một hành trình rèn luyện...
-                <a href="#">Đọc tiếp</a>
+                Việc lựa chọn món quà Giáng sinh ý nghĩa cho con luôn là trăn trở...
+                <a href="news_giangsinh.php">Đọc tiếp</a>
               </p>
             </div>
           </div>
+
         </div>
       </div>
     </section>

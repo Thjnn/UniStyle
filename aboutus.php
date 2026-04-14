@@ -14,7 +14,10 @@
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-  <link rel="shortcut icon" href="assets/file_anh/logo.png" />
+  <!-- logo web -->
+  <link
+    rel="shortcut icon"
+    href="assets/file_anh/0c4690d7-3599-4de4-a0a4-841817ead1c0.png" />
 
   <link rel="stylesheet" href="./assets/css/reposive.css" />
   <link rel="stylesheet" href="./assets/css/aboutus.css" />
@@ -64,6 +67,75 @@
       </div>
     </div>
   </header>
+
+  <!-- Mobile Menu Overlay -->
+  <div class="mobile-menu-overlay" id="mobileMenuOverlay">
+    <div class="mobile-menu-content">
+      <div class="mobile-menu-header">
+        <div class="logo">
+          <img
+            src="./assets/file_anh/0c4690d7-3599-4de4-a0a4-841817ead1c0.png"
+            alt="" />
+        </div>
+        <div class="menu-close" id="menuClose">
+          <span class="material-symbols-outlined">close</span>
+        </div>
+      </div>
+
+      <!-- MENU CHỮ (ĐỂ Ở ĐÂY) -->
+      <nav class="mobile-nav">
+        <ul>
+          <li><a href="index.php" class="mobile-menu-link">Trang chủ</a></li>
+          <li><a href="shop.php" class="mobile-menu-link">Cửa hàng</a></li>
+          <li><a href="contact.html" class="mobile-menu-link">Liên hệ</a></li>
+          <li><a href="FAQ.html" class="mobile-menu-link">FAQ</a></li>
+          <li>
+            <a href="aboutus.html" class="mobile-menu-link">Về chúng tôi</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+  <!-- script menu mobile -->
+  <script>
+    const menuToggle = document.querySelector(".menu-toggle");
+    const mobileMenu = document.querySelector(".mobile-menu-overlay");
+    const menuClose = document.querySelector(".menu-close");
+
+    // Mở menu
+    menuToggle.addEventListener("click", () => {
+      mobileMenu.classList.add("active");
+      document.body.style.overflow = "hidden"; // khóa scroll
+    });
+
+    // Đóng menu bằng nút X
+    menuClose.addEventListener("click", () => {
+      mobileMenu.classList.remove("active");
+      document.body.style.overflow = "";
+    });
+
+    // Click ra ngoài overlay để đóng
+    mobileMenu.addEventListener("click", (e) => {
+      if (e.target === mobileMenu) {
+        mobileMenu.classList.remove("active");
+        document.body.style.overflow = "";
+      }
+    });
+
+    // Click link thì tự đóng menu
+    document.querySelectorAll(".mobile-nav a").forEach((link) => {
+      link.addEventListener("click", () => {
+        mobileMenu.classList.remove("active");
+        document.body.style.overflow = "";
+      });
+    });
+    // Thanh tìm kiếm
+    const searchBox = document.querySelector(".search-box");
+    const searchIcon = document.querySelector(".search-icon");
+    searchIcon.addEventListener("click", () => {
+      searchBox.classList.toggle("active");
+    });
+  </script>
 
   <!-- HERO -->
   <section class="hero about-hero">
