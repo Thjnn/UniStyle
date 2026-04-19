@@ -3,6 +3,23 @@ include("session.php");
 
 include("./config/db.php");
 
+// ── Lấy từ khóa tìm kiếm ─────────────────────────────────
+$keyword = trim($_GET['keyword'] ?? '');
+
+// ── Endpoint AJAX gợi ý tìm kiếm ─────────────────────────
+if (isset($_GET['ajax_suggest'])) {
+  header('Content-Type: application/json');
+  $q   = trim($_GET['ajax_suggest']);
+  $out = [];
+  if (strlen($q) >= 1) {
+    $qs  = mysqli_real_escape_string($conn, $q);
+    $res = mysqli_query($conn, "SELECT MaSP, TenSP, GiaBan, Hinh FROM sanpham WHERE TenSP LIKE '%$qs%' LIMIT 6");
+    if ($res) while ($r = mysqli_fetch_assoc($res)) $out[] = $r;
+  }
+  echo json_encode($out);
+  exit();
+}
+
 $sql = "SELECT * FROM danhmuc LIMIT 6";
 $result = mysqli_query($conn, $sql);
 
@@ -15,6 +32,7 @@ if (!empty($_SESSION['cart'])) {
     $totalQty += $item['soluong'];
   }
 }
+
 
 ?>
 
@@ -44,6 +62,260 @@ if (!empty($_SESSION['cart'])) {
   <link rel="stylesheet" href="./assets/css/reposive.css" />
   <!-- script -->
   <!-- <script src="script.js"></script> -->
+  <style>
+    /* ══ THANH TÌM KIẾM ══════════════════════════════════════════════ */
+    .search-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-wrap form {
+      display: flex;
+      align-items: center;
+      background: #fff;
+      border: 2px solid #e0e0e0;
+      border-radius: 24px;
+      overflow: visible;
+      transition: border-color .2s, box-shadow .2s;
+      position: relative;
+    }
+
+    .search-wrap form:focus-within {
+      border-color: #ff6a00;
+      box-shadow: 0 0 0 3px rgba(255, 106, 0, .12);
+    }
+
+    .search-wrap form input {
+      border: none;
+      outline: none;
+      background: transparent;
+      padding: 9px 14px 9px 16px;
+      font-size: 14px;
+      width: 260px;
+      color: #333;
+    }
+
+    .search-wrap form button[type=submit] {
+      background: #ff6a00;
+      border: none;
+      border-radius: 0 22px 22px 0;
+      padding: 9px 16px;
+      cursor: pointer;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      transition: background .2s;
+      flex-shrink: 0;
+    }
+
+    .search-wrap form button[type=submit]:hover {
+      background: #e05a00;
+    }
+
+    .search-wrap form button[type=submit] .material-symbols-outlined {
+      font-size: 20px;
+    }
+
+    /* ── Nút xóa ── */
+    .btn-clear-kw {
+      position: absolute;
+      right: 48px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #e0e0e0;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 12px;
+      color: #666;
+      z-index: 2;
+      transition: background .15s;
+    }
+
+    .btn-clear-kw:hover {
+      background: #ccc;
+    }
+
+    /* ── Dropdown gợi ý ── */
+    .suggest-box {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      background: #fff;
+      border: 1px solid #e8e8e8;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .12);
+      z-index: 9999;
+      overflow: hidden;
+      display: none;
+    }
+
+    .suggest-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: background .15s;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .suggest-item:hover {
+      background: #fff8f5;
+    }
+
+    .suggest-item img {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid #eee;
+      flex-shrink: 0;
+    }
+
+    .suggest-item-name {
+      font-size: 13px;
+      color: #333;
+      line-height: 1.4;
+      flex: 1;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .suggest-item-price {
+      font-size: 13px;
+      font-weight: 600;
+      color: #ee4d2d;
+      white-space: nowrap;
+    }
+
+    .suggest-footer {
+      padding: 10px 14px;
+      border-top: 1px solid #f0f0f0;
+      font-size: 13px;
+      color: #ff6a00;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: background .15s;
+    }
+
+    .suggest-footer:hover {
+      background: #fff8f5;
+    }
+
+    /* ══ KẾT QUẢ TÌM KIẾM BANNER ════════════════════════════════════ */
+    .search-result-bar {
+      background: #fff;
+      border: 1px solid #ffe0cc;
+      border-radius: 8px;
+      padding: 14px 20px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .search-result-bar .kw-label {
+      font-size: 15px;
+      color: #333;
+    }
+
+    .search-result-bar .kw-label strong {
+      color: #ff6a00;
+      font-size: 17px;
+    }
+
+    .search-result-bar .kw-count {
+      font-size: 13px;
+      color: #888;
+      background: #f5f5f5;
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    .btn-clear-search {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 14px;
+      background: #fff;
+      border: 1px solid #ff6a00;
+      color: #ff6a00;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all .2s;
+    }
+
+    .btn-clear-search:hover {
+      background: #ff6a00;
+      color: #fff;
+    }
+
+    /* ── Empty state ── */
+    .search-empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: #aaa;
+    }
+
+    .search-empty .material-symbols-outlined {
+      font-size: 64px;
+      display: block;
+      margin-bottom: 12px;
+      color: #ddd;
+    }
+
+    .search-empty h3 {
+      font-size: 18px;
+      color: #555;
+      margin-bottom: 8px;
+    }
+
+    .search-empty p {
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    .search-empty a {
+      color: #ff6a00;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    /* ── Highlight từ khóa trong tên sản phẩm ── */
+    .kw-highlight {
+      background: #fff3cd;
+      color: #e65100;
+      border-radius: 2px;
+      padding: 0 2px;
+      font-weight: 600;
+    }
+
+    /* Sort select */
+    .sort-select {
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 7px 12px;
+      font-size: 14px;
+      outline: none;
+      cursor: pointer;
+    }
+  </style>
 </head>
 
 <body>
@@ -51,90 +323,45 @@ if (!empty($_SESSION['cart'])) {
   <header>
     <div class="container">
       <div class="header-content">
-        <div class="menu-toggle">
-          <span class="material-symbols-outlined">menu</span>
-        </div>
-        <div class="logo">
-          <a href="index.php"><img
-              src="./assets/file_anh/0c4690d7-3599-4de4-a0a4-841817ead1c0.png"
-              alt="" /></a>
-        </div>
+        <div class="menu-toggle"><span class="material-symbols-outlined">menu</span></div>
+        <div class="logo"><a href="index.php"><img
+              src="./assets/file_anh/0c4690d7-3599-4de4-a0a4-841817ead1c0.png" alt="" /></a></div>
         <nav>
           <ul>
             <li><a href="index.php">Trang chủ</a></li>
-
-            <li class="has-submenu">
-              <a href="shop.php">Cửa hàng</a>
-
-              <div class="submenu">
-                <!-- LEFT: danh mục -->
-                <div class="submenu-left">
-                  <div class="submenu-column">
-                    <h4>Bút viết</h4>
-                    <a href="#">Bút bi</a>
-                    <a href="#">Bút màu</a>
-                    <a href="#">Bút dạ quang</a>
-                  </div>
-
-                  <div class="submenu-column">
-                    <h4>Văn phòng phẩm</h4>
-                    <a href="#">Sổ</a>
-                    <a href="#">Bìa hồ sơ</a>
-                    <a href="#">Dập ghim</a>
-                    <a href="#">Băng keo</a>
-                  </div>
-
-                  <div class="submenu-column">
-                    <h4>Dụng cụ học tập</h4>
-                    <a href="#">Thước</a>
-                    <a href="#">Máy tính</a>
-                    <a href="#">Dao rọc giấy</a>
-                  </div>
-                </div>
-
-                <!-- RIGHT: banner -->
-                <div class="submenu-banner">
-                  <a href="#!">
-                    <img
-                      src="./assets/file_anh/1920_x_600___cta___6_.webp"
-                      alt="Back To School Sale" />
-                  </a>
-                </div>
-              </div>
-            </li>
+            <li><a href="shop.php">Cửa hàng</a></li>
             <li><a href="contact.php">Liên hệ</a></li>
             <li><a href="FAQ.php">FAQ</a></li>
             <li><a href="aboutus.php">Về chúng tôi</a></li>
           </ul>
         </nav>
         <div class="header-icons">
-          <div class="search-box">
-            <span class="material-symbols-outlined search-icon">search</span>
 
-            <form class="search-form" action="shop.php" method="GET">
-              <input
-                type="text"
-                name="keyword"
-                placeholder="Tìm sản phẩm..." />
+          <!-- ══ SEARCH BOX ══ -->
+          <div class="search-wrap" id="searchWrap">
+            <form action="shop.php" method="GET" id="searchForm" autocomplete="off">
+              <input type="text" name="keyword" id="searchInput" placeholder="Tìm sản phẩm..."
+                value="<?= htmlspecialchars($keyword) ?>" aria-label="Tìm kiếm sản phẩm" />
+              <?php if ($keyword): ?>
+                <button type="button" class="btn-clear-kw" id="btnClearKw" title="Xóa">✕</button>
+              <?php endif; ?>
+              <button type="submit"><span class="material-symbols-outlined">search</span></button>
             </form>
+            <!-- Dropdown gợi ý -->
+            <div class="suggest-box" id="suggestBox"></div>
           </div>
+
           <div class="cart-icon">
             <a href="package.php">
               <span class="material-symbols-outlined">local_mall</span>
-
-              <?php if ($totalQty > 0): ?>
-                <span class="cart-count"><?= $totalQty ?></span>
-              <?php endif; ?>
+              <?php if ($totalQty > 0): ?><span class="cart-count"><?= $totalQty ?></span><?php endif; ?>
             </a>
           </div>
-
-          <?php
-          if (isset($_SESSION['khachhang_id'])) {
-            echo '<a href="profile.php"><span class="material-symbols-outlined"> person </span></a>';
-          } else {
-            echo '<a href="login.php"><span class="material-symbols-outlined"> person </span></a>';
-          }
-          ?>
+          <?php if (isset($_SESSION['khachhang_id'])): ?>
+            <a href="profile.php"><span class="material-symbols-outlined">person</span></a>
+          <?php else: ?>
+            <a href="login.php"><span class="material-symbols-outlined">person</span></a>
+          <?php endif; ?>
         </div>
       </div>
     </div>
@@ -665,6 +892,133 @@ if (!empty($_SESSION['cart'])) {
       </div>
     </div>
   </footer>
+  <!-- ══ SCRIPT TÌM KIẾM GỢI Ý ══════════════════════════════════════════ -->
+  <script>
+    (function() {
+      const input = document.getElementById('searchInput');
+      const suggestBox = document.getElementById('suggestBox');
+      const btnClear = document.getElementById('btnClearKw');
+      let timer = null;
+
+      if (!input) return;
+
+      // Nút xóa từ khóa
+      if (btnClear) {
+        btnClear.addEventListener('click', () => {
+          input.value = '';
+          input.focus();
+          hideSuggest();
+          const url = new URL(window.location.href);
+          url.searchParams.delete('keyword');
+          window.location.href = url.toString();
+        });
+      }
+
+      // Gõ → gợi ý
+      input.addEventListener('input', function() {
+        clearTimeout(timer);
+        const q = this.value.trim();
+        if (q.length < 1) {
+          hideSuggest();
+          return;
+        }
+        timer = setTimeout(() => fetchSuggest(q), 220);
+      });
+
+      // Focus → show lại nếu có nội dung
+      input.addEventListener('focus', function() {
+        if (this.value.trim().length >= 1) fetchSuggest(this.value.trim());
+      });
+
+      // Click ngoài → ẩn
+      document.addEventListener('click', e => {
+        if (!document.getElementById('searchWrap').contains(e.target)) hideSuggest();
+      });
+
+      // Phím mũi tên + Escape điều hướng gợi ý
+      input.addEventListener('keydown', function(e) {
+        const items = suggestBox.querySelectorAll('.suggest-item[data-idx]');
+        let cur = [...items].findIndex(el => el.classList.contains('hover'));
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          cur = Math.min(cur + 1, items.length - 1);
+          items.forEach(el => el.classList.remove('hover'));
+          if (items[cur]) {
+            items[cur].classList.add('hover');
+            input.value = items[cur].dataset.name;
+          }
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          cur = Math.max(cur - 1, 0);
+          items.forEach(el => el.classList.remove('hover'));
+          if (items[cur]) {
+            items[cur].classList.add('hover');
+            input.value = items[cur].dataset.name;
+          }
+        } else if (e.key === 'Escape') {
+          hideSuggest();
+        }
+      });
+
+      function fetchSuggest(q) {
+        fetch('index.php?ajax_suggest=' + encodeURIComponent(q))
+          .then(r => r.json())
+          .then(data => renderSuggest(data, q))
+          .catch(() => hideSuggest());
+      }
+
+      function renderSuggest(data, q) {
+        if (!data || data.length === 0) {
+          hideSuggest();
+          return;
+        }
+        let html = '';
+        data.forEach((sp, idx) => {
+          const name = escHtml(sp.TenSP);
+          const highlighted = name.replace(
+            new RegExp('(' + escRegex(escHtml(q)) + ')', 'gi'),
+            '<strong style="color:#ff6a00">$1</strong>'
+          );
+          html += `<a class="suggest-item" href="product-detail.php?id=${sp.MaSP}"
+                          data-idx="${idx}" data-name="${escHtml(sp.TenSP)}">
+                          <img src="./assets/file_anh/San_Pham/${escHtml(sp.Hinh)}" alt=""/>
+                          <span class="suggest-item-name">${highlighted}</span>
+                          <span class="suggest-item-price">${fmtMoney(sp.GiaBan)}đ</span>
+                       </a>`;
+        });
+        html += `<div class="suggest-footer" onclick="submitSearch()">
+                      <span class="material-symbols-outlined" style="vertical-align:middle;font-size:15px">search</span>
+                      Xem tất cả kết quả cho "<strong>${escHtml(q)}</strong>"
+                   </div>`;
+        suggestBox.innerHTML = html;
+        suggestBox.style.display = 'block';
+      }
+
+      function hideSuggest() {
+        suggestBox.style.display = 'none';
+        suggestBox.innerHTML = '';
+      }
+
+      function submitSearch() {
+        document.getElementById('searchForm').submit();
+      }
+
+      function fmtMoney(n) {
+        return Number(n).toLocaleString('vi-VN');
+      }
+
+      function escHtml(s) {
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      }
+
+      function escRegex(s) {
+        return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+
+      window.submitSearch = submitSearch;
+    })();
+  </script>
+
   <!-- Back to Top -->
   <button id="backToTop">
     <span class="material-symbols-outlined"> keyboard_arrow_up </span>

@@ -1,45 +1,130 @@
 <?php
-include("session.php");
-
+session_start();
 include("./config/db.php");
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require 'PHPMailer/src/PHPMailer.php';
+require 'PHPMailer/src/SMTP.php';
+require 'PHPMailer/src/Exception.php';
+
 $totalQty = 0;
 if (!empty($_SESSION['cart'])) {
   foreach ($_SESSION['cart'] as $item) {
     $totalQty += $item['soluong'];
   }
 }
+
+// XỬ LÝ GỬI MAIL
+if (isset($_POST['send'])) {
+
+  $name = $_POST['name'];
+  $email = $_POST['email'];
+  $phone = $_POST['phone'];
+  $message = $_POST['message'];
+
+  $mail = new PHPMailer(true);
+
+  try {
+    $mail->isSMTP();
+    $mail->Host       = 'smtp.gmail.com';
+    $mail->SMTPAuth   = true;
+    $mail->Username   = 'nguyenvantruc2607@gmail.com';
+    $mail->Password   = 'ynwu rkwx ypvi aeax';
+    $mail->SMTPSecure = 'tls';
+    $mail->Port       = 587;
+
+    $mail->setFrom('nguyenvantruc2607@gmail.com', 'UniStyle');
+    $mail->addAddress('nguyenvantruc2607@gmail.com');
+
+    $mail->isHTML(true);
+    $mail->Subject = 'Liên hệ từ website';
+
+    $mail->Body = "
+      <h3>Thông tin liên hệ</h3>
+      <p><b>Họ tên:</b> $name</p>
+      <p><b>Email:</b> $email</p>
+      <p><b>SĐT:</b> $phone</p>
+      <p><b>Nội dung:</b> $message</p>
+    ";
+
+    $mail->send();
+    $success = true;
+  } catch (Exception $e) {
+    $error = "Gửi thất bại!";
+  }
+}
 ?>
+
 <!doctype html>
-<html lang="en">
+<html lang="vi">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Contact</title>
-  <!-- embed link icon  -->
-  <link
-    rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,0..1" />
-  <!--embed Font Awesome -->
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <!-- logo web -->
-  <link
-    rel="shortcut icon"
-    href="assets/file_anh/0c4690d7-3599-4de4-a0a4-841817ead1c0.png" />
-  <!-- css -->
-  <link rel="stylesheet" href="./assets/css/contact.css" />
-  <link rel="stylesheet" href="./assets/css/style.css" />
+  <meta charset="UTF-8">
+  <title>Liên hệ</title>
 
-  <!-- repo -->
+  <link rel="stylesheet" href="./assets/css/style.css">
+  <link rel="stylesheet" href="./assets/css/contact.css">
+
+  <!-- Font + icon -->
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- Responsive -->
   <link rel="stylesheet" href="./assets/css/reposive.css" />
-  <!-- script -->
-  <!-- <script src="script.js"></script> -->
+
+  <!-- 🔥 ALERT STYLE -->
+  <style>
+    .alert-popup {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #4CAF50;
+      color: white;
+      padding: 20px 25px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      z-index: 9999;
+      animation: slideIn 0.5s ease;
+    }
+
+    .alert-popup.error {
+      background: #e74c3c;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+  </style>
 </head>
 
 <body>
-  <!-- Header -->
+
+  <!-- 🔥 ALERT -->
+  <?php if (isset($success)): ?>
+    <div class="alert-popup">
+      Cảm ơn bạn đã liên hệ!<br>
+      Chúng tôi sẽ phản hồi sớm nhất.
+    </div>
+  <?php endif; ?>
+
+  <?php if (isset($error)): ?>
+    <div class="alert-popup error">
+      Gửi thất bại!
+    </div>
+  <?php endif; ?>
+
   <header>
     <div class="container">
       <div class="header-content">
@@ -47,53 +132,13 @@ if (!empty($_SESSION['cart'])) {
           <span class="material-symbols-outlined">menu</span>
         </div>
         <div class="logo">
-          <a href="index.php"><img
-              src="./assets/file_anh/0c4690d7-3599-4de4-a0a4-841817ead1c0.png"
+          <a href="index.php"><img src="./assets/file_anh/0c4690d7-3599-4de4-a0a4-841817ead1c0.png"
               alt="" /></a>
         </div>
         <nav>
           <ul>
             <li><a href="index.php">Trang chủ</a></li>
-
-            <li class="has-submenu">
-              <a href="shop.php">Cửa hàng</a>
-
-              <div class="submenu">
-                <!-- LEFT: danh mục -->
-                <div class="submenu-left">
-                  <div class="submenu-column">
-                    <h4>Bút viết</h4>
-                    <a href="#">Bút bi</a>
-                    <a href="#">Bút màu</a>
-                    <a href="#">Bút dạ quang</a>
-                  </div>
-
-                  <div class="submenu-column">
-                    <h4>Văn phòng phẩm</h4>
-                    <a href="#">Sổ</a>
-                    <a href="#">Bìa hồ sơ</a>
-                    <a href="#">Dập ghim</a>
-                    <a href="#">Băng keo</a>
-                  </div>
-
-                  <div class="submenu-column">
-                    <h4>Dụng cụ học tập</h4>
-                    <a href="#">Thước</a>
-                    <a href="#">Máy tính</a>
-                    <a href="#">Dao rọc giấy</a>
-                  </div>
-                </div>
-
-                <!-- RIGHT: banner -->
-                <div class="submenu-banner">
-                  <a href="#!">
-                    <img
-                      src="./assets/file_anh/1920_x_600___cta___6_.webp"
-                      alt="Back To School Sale" />
-                  </a>
-                </div>
-              </div>
-            </li>
+            <li><a href="shop.php">Cửa hàng</a></li>
             <li><a href="contact.php">Liên hệ</a></li>
             <li><a href="FAQ.php">FAQ</a></li>
             <li><a href="aboutus.php">Về chúng tôi</a></li>
@@ -104,10 +149,7 @@ if (!empty($_SESSION['cart'])) {
             <span class="material-symbols-outlined search-icon">search</span>
 
             <form class="search-form" action="shop.php" method="GET">
-              <input
-                type="text"
-                name="keyword"
-                placeholder="Tìm sản phẩm..." />
+              <input type="text" name="keyword" placeholder="Tìm sản phẩm..." />
             </form>
           </div>
           <div class="cart-icon">
@@ -119,7 +161,6 @@ if (!empty($_SESSION['cart'])) {
               <?php endif; ?>
             </a>
           </div>
-
           <?php
           if (isset($_SESSION['khachhang_id'])) {
             echo '<a href="profile.php"><span class="material-symbols-outlined"> person </span></a>';
@@ -132,78 +173,13 @@ if (!empty($_SESSION['cart'])) {
     </div>
   </header>
 
-  <!-- Mobile Menu Overlay -->
-  <div class="mobile-menu-overlay" id="mobileMenuOverlay">
-    <div class="mobile-menu-content">
-      <div class="mobile-menu-header">
-        <div class="logo">
-          <img
-            src="./assets/file_anh/0c4690d7-3599-4de4-a0a4-841817ead1c0.png"
-            alt="" />
-        </div>
-        <div class="menu-close" id="menuClose">
-          <span class="material-symbols-outlined">close</span>
-        </div>
-      </div>
 
-      <!-- MENU CHỮ (ĐỂ Ở ĐÂY) -->
-      <nav class="mobile-nav">
-        <ul>
-          <li><a href="index.html" class="mobile-menu-link">Trang chủ</a></li>
-          <li><a href="shop.html" class="mobile-menu-link">Cửa hàng</a></li>
-          <li><a href="contact.html" class="mobile-menu-link">Liên hệ</a></li>
-          <li><a href="FAQ.html" class="mobile-menu-link">FAQ</a></li>
-          <li>
-            <a href="aboutus.html" class="mobile-menu-link">Về chúng tôi</a>
-          </li>
-        </ul>
-      </nav>
-    </div>
-  </div>
-  <!-- script menu mobile -->
-  <script>
-    const menuToggle = document.querySelector(".menu-toggle");
-    const mobileMenu = document.querySelector(".mobile-menu-overlay");
-    const menuClose = document.querySelector(".menu-close");
 
-    // Mở menu
-    menuToggle.addEventListener("click", () => {
-      mobileMenu.classList.add("active");
-      document.body.style.overflow = "hidden"; // khóa scroll
-    });
-
-    // Đóng menu bằng nút X
-    menuClose.addEventListener("click", () => {
-      mobileMenu.classList.remove("active");
-      document.body.style.overflow = "";
-    });
-
-    // Click ra ngoài overlay để đóng
-    mobileMenu.addEventListener("click", (e) => {
-      if (e.target === mobileMenu) {
-        mobileMenu.classList.remove("active");
-        document.body.style.overflow = "";
-      }
-    });
-
-    // Click link thì tự đóng menu
-    document.querySelectorAll(".mobile-nav a").forEach((link) => {
-      link.addEventListener("click", () => {
-        mobileMenu.classList.remove("active");
-        document.body.style.overflow = "";
-      });
-    });
-    // Thanh tìm kiếm
-    const searchBox = document.querySelector(".search-box");
-    const searchIcon = document.querySelector(".search-icon");
-    searchIcon.addEventListener("click", () => {
-      searchBox.classList.toggle("active");
-    });
-  </script>
-  <!-- main -->
   <section class="contact-section">
     <div class="container contact-wrapper">
-      <!-- LEFT -->
+
+
+      <!-- FORM -->
       <div class="contact-left">
         <h2>UniStyle</h2>
 
@@ -227,57 +203,41 @@ if (!empty($_SESSION['cart'])) {
         <hr />
 
         <h3>LIÊN HỆ VỚI CHÚNG TÔI</h3>
-
-        <form class="contact-form">
-          <input type="text" placeholder="Họ tên*" required />
-
-          <input type="email" placeholder="Email*" required />
-
-          <input type="text" placeholder="Số điện thoại*" required />
-
-          <textarea placeholder="Nhập nội dung*" rows="6"></textarea>
-
-          <button type="submit">Gửi liên hệ của bạn</button>
+        <form method="POST" class="contact-form" id="contactForm">
+          <input type="text" name="name" placeholder="Họ tên*" required>
+          <input type="email" name="email" placeholder="Email*" required>
+          <input type="text" name="phone" placeholder="SĐT*" required>
+          <textarea name="message" placeholder="Nội dung*" required></textarea>
+          <button type="submit" name="send">Gửi liên hệ</button>
         </form>
       </div>
 
-      <!-- RIGHT -->
+      <!-- MAP -->
       <div class="contact-right">
         <iframe
           src="https://www.google.com/maps?q=16 Thiên Hộ Vương, Mỹ Tho&output=embed"
           width="100%"
-          height="100%"
-          style="border: 0"
+          height="500"
+          style="border:0; border-radius:10px;"
           loading="lazy">
         </iframe>
       </div>
+
     </div>
   </section>
-  <!-- Back to Top -->
-  <button id="backToTop">
-    <span class="material-symbols-outlined"> keyboard_arrow_up </span>
-  </button>
+
+  <!-- 🔥 AUTO HIDE + RESET FORM -->
   <script>
-    const btn = document.getElementById("backToTop");
+    setTimeout(() => {
+      const alert = document.querySelector('.alert-popup');
+      if (alert) alert.style.display = 'none';
+    }, 4000);
 
-    // Hiện nút khi scroll xuống
-    window.onscroll = function() {
-      if (document.documentElement.scrollTop > 200) {
-        btn.style.display = "block";
-      } else {
-        btn.style.display = "none";
-      }
-    };
-
-    // Click để lên đầu trang
-    btn.onclick = function() {
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
-    };
+    // reset form sau khi gửi
+    <?php if (isset($success)): ?>
+      document.getElementById("contactForm").reset();
+    <?php endif; ?>
   </script>
-  <!-- Footer -->
   <footer class="footer">
     <!-- Newsletter -->
     <div class="footer-newsletter">
@@ -302,9 +262,7 @@ if (!empty($_SESSION['cart'])) {
       <!-- Logo + contact -->
       <div class="footer-col">
         <h2 class="logo">
-          <img
-            src="./assets/file_anh/0c4690d7-3599-4de4-a0a4-841817ead1c0.png"
-            alt="" />
+          <img src="./assets/file_anh/0c4690d7-3599-4de4-a0a4-841817ead1c0.png" alt="" />
           UniStyle
         </h2>
         <p>

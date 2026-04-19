@@ -98,8 +98,7 @@ if ($madanhmuc > 0) {
                     <span class="material-symbols-outlined">menu</span>
                 </div>
                 <div class="logo">
-                    <a href="index.php"><img
-                            src="./assets/file_anh/0c4690d7-3599-4de4-a0a4-841817ead1c0.png"
+                    <a href="index.php"><img src="./assets/file_anh/0c4690d7-3599-4de4-a0a4-841817ead1c0.png"
                             alt="" /></a>
                 </div>
                 <nav>
@@ -116,10 +115,7 @@ if ($madanhmuc > 0) {
                         <span class="material-symbols-outlined search-icon">search</span>
 
                         <form class="search-form" action="shop.php" method="GET">
-                            <input
-                                type="text"
-                                name="keyword"
-                                placeholder="Tìm sản phẩm..." />
+                            <input type="text" name="keyword" placeholder="Tìm sản phẩm..." />
                         </form>
                     </div>
                     <div class="cart-icon">
@@ -127,7 +123,7 @@ if ($madanhmuc > 0) {
                             <span class="material-symbols-outlined">local_mall</span>
 
                             <?php if ($totalQty > 0): ?>
-                                <span class="cart-count"><?= $totalQty ?></span>
+                            <span class="cart-count"><?= $totalQty ?></span>
                             <?php endif; ?>
                         </a>
                     </div>
@@ -171,43 +167,43 @@ if ($madanhmuc > 0) {
     </div>
     <!-- script menu mobile -->
     <script>
-        const menuToggle = document.querySelector(".menu-toggle");
-        const mobileMenu = document.querySelector(".mobile-menu-overlay");
-        const menuClose = document.querySelector(".menu-close");
+    const menuToggle = document.querySelector(".menu-toggle");
+    const mobileMenu = document.querySelector(".mobile-menu-overlay");
+    const menuClose = document.querySelector(".menu-close");
 
-        // Mở menu
-        menuToggle.addEventListener("click", () => {
-            mobileMenu.classList.add("active");
-            document.body.style.overflow = "hidden"; // khóa scroll
-        });
+    // Mở menu
+    menuToggle.addEventListener("click", () => {
+        mobileMenu.classList.add("active");
+        document.body.style.overflow = "hidden"; // khóa scroll
+    });
 
-        // Đóng menu bằng nút X
-        menuClose.addEventListener("click", () => {
+    // Đóng menu bằng nút X
+    menuClose.addEventListener("click", () => {
+        mobileMenu.classList.remove("active");
+        document.body.style.overflow = "";
+    });
+
+    // Click ra ngoài overlay để đóng
+    mobileMenu.addEventListener("click", (e) => {
+        if (e.target === mobileMenu) {
+            mobileMenu.classList.remove("active");
+            document.body.style.overflow = "";
+        }
+    });
+
+    // Click link thì tự đóng menu
+    document.querySelectorAll(".mobile-nav a").forEach((link) => {
+        link.addEventListener("click", () => {
             mobileMenu.classList.remove("active");
             document.body.style.overflow = "";
         });
-
-        // Click ra ngoài overlay để đóng
-        mobileMenu.addEventListener("click", (e) => {
-            if (e.target === mobileMenu) {
-                mobileMenu.classList.remove("active");
-                document.body.style.overflow = "";
-            }
-        });
-
-        // Click link thì tự đóng menu
-        document.querySelectorAll(".mobile-nav a").forEach((link) => {
-            link.addEventListener("click", () => {
-                mobileMenu.classList.remove("active");
-                document.body.style.overflow = "";
-            });
-        });
-        // Thanh tìm kiếm
-        const searchBox = document.querySelector(".search-box");
-        const searchIcon = document.querySelector(".search-icon");
-        searchIcon.addEventListener("click", () => {
-            searchBox.classList.toggle("active");
-        });
+    });
+    // Thanh tìm kiếm
+    const searchBox = document.querySelector(".search-box");
+    const searchIcon = document.querySelector(".search-icon");
+    searchIcon.addEventListener("click", () => {
+        searchBox.classList.toggle("active");
+    });
     </script>
 
     <!-- khi có hàng -->
@@ -215,41 +211,41 @@ if ($madanhmuc > 0) {
         <div class="cart-left">
 
             <?php if (empty($_SESSION['cart'])) { ?>
-                <div class="cart-box">
-                    <h1>Giỏ hàng</h1>
-                    <p>Chưa có sản phẩm - <a href="shop.php">Mua ngay</a></p>
-                </div>
+            <div class="cart-box">
+                <h1>Giỏ hàng</h1>
+                <p>Chưa có sản phẩm - <a href="shop.php">Mua ngay</a></p>
+            </div>
             <?php } else { ?>
 
-                <?php
+            <?php
                 $total = 0;
                 foreach ($_SESSION['cart'] as $index => $item):
                     $thanhtien = (int)$item['gia'] * (int)$item['soluong'];
                     $total += $thanhtien;
                 ?>
 
-                    <div class="cart-item">
-                        <img src="assets/file_anh/San_Pham/<?php echo $item['hinh']; ?>" class="cart-img" />
+            <div class="cart-item">
+                <img src="assets/file_anh/San_Pham/<?php echo $item['hinh']; ?>" class="cart-img" />
 
-                        <div class="cart-info">
-                            <h3><?php echo $item['tensp']; ?></h3>
-                            <p class="variant"><?php echo $item['size']; ?></p>
-                        </div>
+                <div class="cart-info">
+                    <h3><?php echo $item['tensp']; ?></h3>
+                    <p class="variant"><?php echo $item['size']; ?></p>
+                </div>
 
-                        <div class="cart-price">
-                            <span class="price"><?php echo number_format($item['gia']); ?>đ</span>
-                        </div>
+                <div class="cart-price">
+                    <span class="price"><?php echo number_format($item['gia']); ?>đ</span>
+                </div>
 
-                        <div class="cart-qty">
-                            <a href="?action=minus&index=<?php echo $index; ?>">-</a>
-                            <input type="text" value="<?php echo $item['soluong']; ?>" />
-                            <a href="?action=plus&index=<?php echo $index; ?>">+</a>
-                        </div>
+                <div class="cart-qty">
+                    <a href="?action=minus&index=<?php echo $index; ?>">-</a>
+                    <input type="text" value="<?php echo $item['soluong']; ?>" />
+                    <a href="?action=plus&index=<?php echo $index; ?>">+</a>
+                </div>
 
-                        <a href="?del=<?php echo $index; ?>" style="color:red">Xóa</a>
-                    </div>
+                <a href="?del=<?php echo $index; ?>" style="color:red">Xóa</a>
+            </div>
 
-                <?php endforeach; ?>
+            <?php endforeach; ?>
 
         </div>
 
@@ -258,10 +254,12 @@ if ($madanhmuc > 0) {
             <h3>Tổng tiền <span><?php echo number_format($total); ?>đ</span></h3>
 
             <textarea placeholder="Ghi chú đơn hàng"></textarea>
-
-            <button class="checkout-btn">Tiến hành đặt hàng</button>
+            <!-- chon phuong thuc thanh toan   -->
+            <a href="checkout.php" class="checkout-btn" style="display:block;text-align:center;text-decoration:none;">
+                Tiến hành đặt hàng
+            </a>
         </div>
-    <?php } ?>
+        <?php } ?>
     </section>
     <!-- RELATED PRODUCT -->
     <section class="related-product">
@@ -270,35 +268,35 @@ if ($madanhmuc > 0) {
         <div class="product-grid">
 
             <?php if ($result_lq && mysqli_num_rows($result_lq) > 0): ?>
-                <?php while ($sp = mysqli_fetch_assoc($result_lq)): ?>
-                    <div class="product-card">
-                        <div class="product-img">
-                            <img src="assets/file_anh/San_Pham/<?php echo $sp['Hinh']; ?>" />
-                        </div>
+            <?php while ($sp = mysqli_fetch_assoc($result_lq)): ?>
+            <div class="product-card">
+                <div class="product-img">
+                    <img src="assets/file_anh/San_Pham/<?php echo $sp['Hinh']; ?>" />
+                </div>
 
-                        <div class="product-info">
-                            <div class="product-tag">
-                                <span class="new">👍 New</span>
-                            </div>
-
-                            <h3 class="product-name">
-                                <?php echo $sp['TenSP']; ?>
-                            </h3>
-
-                            <div class="price">
-                                <?php echo number_format($sp['GiaBan']); ?>đ
-                            </div>
-
-                            <div class="old-price">
-                                <?php echo number_format($sp['GiaBan'] * 1.3); ?>đ
-                                <span class="discount">-30%</span>
-                            </div>
-                        </div>
+                <div class="product-info">
+                    <div class="product-tag">
+                        <span class="new">👍 New</span>
                     </div>
 
-                <?php endwhile; ?>
+                    <h3 class="product-name">
+                        <?php echo $sp['TenSP']; ?>
+                    </h3>
+
+                    <div class="price">
+                        <?php echo number_format($sp['GiaBan']); ?>đ
+                    </div>
+
+                    <div class="old-price">
+                        <?php echo number_format($sp['GiaBan'] * 1.3); ?>đ
+                        <span class="discount">-30%</span>
+                    </div>
+                </div>
+            </div>
+
+            <?php endwhile; ?>
             <?php else: ?>
-                <p>Không có sản phẩm cùng loại nào.</p>
+            <p>Không có sản phẩm cùng loại nào.</p>
             <?php endif; ?>
 
         </div>
@@ -308,24 +306,24 @@ if ($madanhmuc > 0) {
         <span class="material-symbols-outlined"> keyboard_arrow_up </span>
     </button>
     <script>
-        const btn = document.getElementById("backToTop");
+    const btn = document.getElementById("backToTop");
 
-        // Hiện nút khi scroll xuống
-        window.onscroll = function() {
-            if (document.documentElement.scrollTop > 200) {
-                btn.style.display = "block";
-            } else {
-                btn.style.display = "none";
-            }
-        };
+    // Hiện nút khi scroll xuống
+    window.onscroll = function() {
+        if (document.documentElement.scrollTop > 200) {
+            btn.style.display = "block";
+        } else {
+            btn.style.display = "none";
+        }
+    };
 
-        // Click để lên đầu trang
-        btn.onclick = function() {
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth",
-            });
-        };
+    // Click để lên đầu trang
+    btn.onclick = function() {
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+        });
+    };
     </script>
     <!-- Footer -->
     <footer class="footer">
