@@ -214,8 +214,25 @@ if (!empty($_SESSION['cart'])) {
                 <div class="quantity">
                     <div class="qty-box">
                         <button onclick="changeQty(-1)">-</button>
-                        <input type="text" id="qty" value="1">
+                        <input type="text" id="qty" value="1" max="<?= $sp['SoLuongTon'] ?>">
                         <button onclick="changeQty(1)">+</button>
+                    </div>
+
+                    <!-- Số lượng tồn kho -->
+                    <div class="stock-info" style="margin-top: 20px;">
+                        <?php if ($sp['SoLuongTon'] > 0): ?>
+                            <span class="stock-count">
+                                <span class="material-symbols-outlined"
+                                    style="font-size:16px;vertical-align:middle;color:#26aa99">inventory_2</span>
+                                Còn lại: <strong><?= number_format($sp['SoLuongTon']) ?></strong> sản phẩm
+                            </span>
+                        <?php else: ?>
+                            <span class="out-of-stock">
+                                <span class="material-symbols-outlined"
+                                    style="font-size:16px;vertical-align:middle">remove_shopping_cart</span>
+                                Hết hàng
+                            </span>
+                        <?php endif; ?>
                     </div>
                 </div>
 

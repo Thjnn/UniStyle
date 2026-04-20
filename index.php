@@ -329,7 +329,43 @@ if (!empty($_SESSION['cart'])) {
         <nav>
           <ul>
             <li><a href="index.php">Trang chủ</a></li>
-            <li><a href="shop.php">Cửa hàng</a></li>
+            <li class="has-submenu">
+              <a href="shop.php">Cửa hàng</a>
+
+              <div class="submenu">
+                <!-- LEFT: danh mục -->
+                <div class="submenu-left">
+                  <div class="submenu-column">
+                    <h4>Bút viết</h4>
+                    <a href="http://localhost/DoAnNganh/shop.php?category_id=8">Bút bi</a>
+                    <a href="http://localhost/DoAnNganh/shop.php?category_id=17">Bút chì</a>
+                    <a href="http://localhost/DoAnNganh/shop.php?category_id=10">Bút lông</a>
+                  </div>
+
+                  <div class="submenu-column">
+                    <h4>Văn phòng phẩm</h4>
+                    <a href="http://localhost/DoAnNganh/shop.php?category_id=18">Sổ</a>
+                    <a href="http://localhost/DoAnNganh/shop.php?category_id=1">Bìa hồ sơ</a>
+                    <a href="http://localhost/DoAnNganh/shop.php?category_id=15">Dập ghim</a>
+                    <a href="http://localhost/DoAnNganh/shop.php?category_id=16">Băng keo</a>
+                  </div>
+
+                  <div class="submenu-column">
+                    <h4>Dụng cụ học tập</h4>
+                    <a href="http://localhost/DoAnNganh/shop.php?category_id=4">Thước</a>
+                    <a href="http://localhost/DoAnNganh/shop.php?category_id=3">Máy tính</a>
+                    <a href="http://localhost/DoAnNganh/shop.php?category_id=14">Dao rọc giấy</a>
+                  </div>
+                </div>
+
+                <!-- RIGHT: banner -->
+                <div class="submenu-banner">
+                  <a href="#!">
+                    <img src="./assets/file_anh/1920_x_600___cta___6_.webp" alt="Back To School Sale" />
+                  </a>
+                </div>
+              </div>
+            </li>
             <li><a href="contact.php">Liên hệ</a></li>
             <li><a href="FAQ.php">FAQ</a></li>
             <li><a href="aboutus.php">Về chúng tôi</a></li>

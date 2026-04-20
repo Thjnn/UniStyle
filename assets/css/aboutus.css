@@ -628,3 +628,58 @@ nav a:hover {
   margin: 10px auto 0;
   border-radius: 2px;
 }
+/* ===== SUBMENU DROPDOWN ===== */
+
+.has-submenu {
+  position: relative;
+}
+
+.submenu {
+  position: absolute;
+  top: 100%;
+  left: 10%;
+  width: 1000px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+
+  display: flex;
+  gap: 20px;
+
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: 0.3s;
+
+  z-index: 999;
+}
+
+.has-submenu:hover .submenu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.submenu-left {
+  display: flex;
+  gap: 40px;
+}
+
+.submenu-column h4 {
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: #333;
+}
+
+.submenu-column a {
+  display: block;
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 5px;
+  transition: 0.3s;
+}
+
+.submenu-column a:hover {
+  color: #52c270;
+}

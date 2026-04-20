@@ -489,18 +489,10 @@ $orders_today = $row_today['total_today'];
               <div class="sec-title">Quản lý đơn hàng</div>
               <div class="sec-sub"><?= $total ?> đơn hàng tổng cộng</div>
             </div>
-            <!-- Nút xuất báo cáo -->
-            <div class="sec-actions">
-              <button class="btn">
-                <svg
-                  width="13"
-                  height="13"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.6"
-                  stroke-linecap="round">
-                  <path d="M13 10v4H3v-4M8 2v8M5 5l3-3 3 3" />
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
+              <button class="btn btn-primary" onclick="exportOrdersExcel()" style="display: flex; align-items: center; gap: 8px;">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 10v4H2v-4M8 2v10M5 9l3 3 3-3" />
                 </svg>
                 Xuất báo cáo
               </button>
@@ -540,259 +532,40 @@ $orders_today = $row_today['total_today'];
               <div class="sec-title">Quản lý sản phẩm</div>
               <div class="sec-sub">148 sản phẩm đang kinh doanh</div>
             </div>
-            <!-- Nút xuất báo cáo -->
+            <!-- Nút xuất danh sách -->
             <div class="sec-actions">
-              <button class="btn">
-                <svg
-                  width="13"
-                  height="13"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.6"
-                  stroke-linecap="round">
-                  <path d="M13 10v4H3v-4M8 2v8M5 5l3-3 3 3" />
-                </svg>
-                Xuất báo cáo
-              </button>
-              <button class="btn btn-primary">+ Thêm sản phẩm</button>
+              <div class="export-dropdown" id="export-prod-dd">
+                <button class="btn" onclick="toggleExportDD()" style="display:flex;align-items:center;gap:6px">
+                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+                    <path d="M13 10v4H3v-4M8 2v8M5 5l3 3 3-3" />
+                  </svg>
+                  Xuất danh sách
+                  <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <path d="M4 6l4 4 4-4" />
+                  </svg>
+                </button>
+                <div class="export-dd-menu" id="export-dd-menu">
+                  <button class="export-dd-item" onclick="exportProductExcel('excel');toggleExportDD(false)">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#166534" stroke-width="1.8" stroke-linecap="round">
+                      <rect x="2" y="2" width="12" height="12" rx="2" />
+                      <path d="M5 6l2 4 2-4M11 6v4" />
+                    </svg>
+                    Xuất Excel (.xls)
+                  </button>
+                  <button class="export-dd-item" onclick="exportProductExcel('csv');toggleExportDD(false)">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#1d4ed8" stroke-width="1.8" stroke-linecap="round">
+                      <path d="M3 4h10M3 8h7M3 12h5" />
+                    </svg>
+                    Xuất CSV (.csv)
+                  </button>
+                </div>
+              </div>
+              <button class="btn btn-primary" onclick="openAddProductModal()">+ Thêm sản phẩm</button>
             </div>
 
           </div>
 
-          <div class="filter-row">
-            <button class="filter-chip active" onclick="filterChip(this)">
-              Tất cả
-            </button>
-            <button class="filter-chip" onclick="filterChip(this)">
-              Bút viết
-            </button>
-            <button class="filter-chip" onclick="filterChip(this)">
-              Giấy &amp; Tập
-            </button>
-            <button class="filter-chip" onclick="filterChip(this)">
-              Dụng cụ kẹp
-            </button>
-            <button class="filter-chip" onclick="filterChip(this)">
-              Máy văn phòng
-            </button>
-            <button class="filter-chip" onclick="filterChip(this)">
-              Khác
-            </button>
-            <input class="search-input" placeholder="Tìm sản phẩm, SKU..." />
-          </div>
-
-          <div class="card card-full">
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Sản phẩm</th>
-                    <th>Danh mục</th>
-                    <th>Giá bán</th>
-                    <th>Tồn kho</th>
-                    <th>Đã bán</th>
-                    <th>Trạng thái</th>
-                    <th>Thao tác</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <div class="td-flex">
-                        <div class="prod-thumb">✏️</div>
-                        <div>
-                          <div class="prod-name">
-                            Bút bi Thiên Long TL-027
-                          </div>
-                          <div class="prod-sku">SKU: BTL-027-XNH</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>Bút viết</td>
-                    <td>11.000đ</td>
-                    <td>
-                      <div class="stock-wrap">
-                        <div class="stock-track">
-                          <div
-                            class="stock-fill stock-high"
-                            style="width: 75%"></div>
-                        </div>
-                        <span>450</span>
-                      </div>
-                    </td>
-                    <td>1,240</td>
-                    <td><span class="badge badge-green">Kinh doanh</span></td>
-                    <td>
-                      <div class="actions">
-                        <button class="act-btn">Sửa</button><button class="act-btn danger">Xóa</button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="td-flex">
-                        <div class="prod-thumb">📒</div>
-                        <div>
-                          <div class="prod-name">
-                            Tập học sinh Hồng Hà 96tr
-                          </div>
-                          <div class="prod-sku">SKU: TAP-HH-96</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>Giấy &amp; Tập</td>
-                    <td>9.000đ</td>
-                    <td>
-                      <div class="stock-wrap">
-                        <div class="stock-track">
-                          <div
-                            class="stock-fill stock-mid"
-                            style="width: 40%"></div>
-                        </div>
-                        <span style="color: var(--warning)">120</span>
-                      </div>
-                    </td>
-                    <td>980</td>
-                    <td><span class="badge badge-green">Kinh doanh</span></td>
-                    <td>
-                      <div class="actions">
-                        <button class="act-btn">Sửa</button><button class="act-btn danger">Xóa</button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="td-flex">
-                        <div class="prod-thumb">📎</div>
-                        <div>
-                          <div class="prod-name">
-                            Kẹp bướm Deli 51mm (hộp 12c)
-                          </div>
-                          <div class="prod-sku">SKU: KBD-51-12</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>Dụng cụ kẹp</td>
-                    <td>28.000đ</td>
-                    <td>
-                      <div class="stock-wrap">
-                        <div class="stock-track">
-                          <div
-                            class="stock-fill stock-high"
-                            style="width: 60%"></div>
-                        </div>
-                        <span>180</span>
-                      </div>
-                    </td>
-                    <td>762</td>
-                    <td><span class="badge badge-green">Kinh doanh</span></td>
-                    <td>
-                      <div class="actions">
-                        <button class="act-btn">Sửa</button><button class="act-btn danger">Xóa</button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="td-flex">
-                        <div class="prod-thumb">🖊️</div>
-                        <div>
-                          <div class="prod-name">
-                            Bút mực Pentel EnerGel 0.5
-                          </div>
-                          <div class="prod-sku">SKU: BPN-EG-05</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>Bút viết</td>
-                    <td>32.000đ</td>
-                    <td>
-                      <div class="stock-wrap">
-                        <div class="stock-track">
-                          <div
-                            class="stock-fill stock-low"
-                            style="width: 15%"></div>
-                        </div>
-                        <span style="color: var(--danger)">18</span>
-                      </div>
-                    </td>
-                    <td>641</td>
-                    <td><span class="badge badge-amber">Sắp hết</span></td>
-                    <td>
-                      <div class="actions">
-                        <button class="act-btn">Sửa</button><button class="act-btn">Nhập kho</button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="td-flex">
-                        <div class="prod-thumb">🖨️</div>
-                        <div>
-                          <div class="prod-name">
-                            Máy in HP LaserJet M111w
-                          </div>
-                          <div class="prod-sku">SKU: HP-M111W</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>Máy văn phòng</td>
-                    <td>2.990.000đ</td>
-                    <td>
-                      <div class="stock-wrap">
-                        <div class="stock-track">
-                          <div
-                            class="stock-fill stock-mid"
-                            style="width: 30%"></div>
-                        </div>
-                        <span style="color: var(--warning)">9</span>
-                      </div>
-                    </td>
-                    <td>94</td>
-                    <td><span class="badge badge-green">Kinh doanh</span></td>
-                    <td>
-                      <div class="actions">
-                        <button class="act-btn">Sửa</button><button class="act-btn danger">Xóa</button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="td-flex">
-                        <div class="prod-thumb">🗂️</div>
-                        <div>
-                          <div class="prod-name">
-                            Bìa file A4 Deli EG17150
-                          </div>
-                          <div class="prod-sku">SKU: BF-EG17150</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>Khác</td>
-                    <td>12.000đ</td>
-                    <td>
-                      <div class="stock-wrap">
-                        <div class="stock-track">
-                          <div
-                            class="stock-fill stock-low"
-                            style="width: 0%"></div>
-                        </div>
-                        <span style="color: var(--danger); font-weight: 600">Hết</span>
-                      </div>
-                    </td>
-                    <td>320</td>
-                    <td><span class="badge badge-red">Hết hàng</span></td>
-                    <td>
-                      <div class="actions">
-                        <button class="act-btn">Sửa</button><button class="act-btn">Nhập kho</button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <?php require_once __DIR__ . '/../includes/products_table.php'; ?>
         </div>
         <!-- /PAGE PRODUCTS -->
 
@@ -811,23 +584,7 @@ $orders_today = $row_today['total_today'];
             </div>
           </div>
 
-          <div class="filter-row">
-            <button class="filter-chip active" onclick="filterChip(this)">
-              Tất cả (1.842)
-            </button>
-            <button class="filter-chip" onclick="filterChip(this)">
-              Cá nhân
-            </button>
-            <button class="filter-chip" onclick="filterChip(this)">
-              Doanh nghiệp
-            </button>
-            <button class="filter-chip" onclick="filterChip(this)">
-              VIP
-            </button>
-            <input
-              class="search-input"
-              placeholder="Tìm tên, số điện thoại, email..." />
-          </div>
+
 
           <div class="card card-full">
             <div class="table-wrap">
@@ -1206,33 +963,8 @@ $orders_today = $row_today['total_today'];
           </div>
         </div>
         <!-- /PAGE INVENTORY -->
-        <!-- ═══════════════════════════════════════
-           PAGE: REPORT
-      ═══════════════════════════════════════ -->
-        <div class="page" id="page-reports">
-          <div class="sec-header">
-            <div>
-              <div class="sec-title">Báo cáo doanh thu</div>
-              <div class="sec-sub">Phân tích số liệu kinh doanh chi tiết</div>
-            </div>
-            <div class="sec-actions">
-              <button class="btn">Tải xuống PDF</button>
-              <button class="btn btn-primary">Xuất Excel</button>
-            </div>
-          </div>
-          <div class="card">
-            <div
-              class="card-body"
-              style="
-                  padding: 40px;
-                  text-align: center;
-                  color: var(--text-muted);
-                ">
-              <p>Biểu đồ báo cáo chi tiết sẽ hiển thị ở đây.</p>
-            </div>
-          </div>
-        </div>
-        <!-- /PAGE REPORT -->
+
+
         <!-- ═══════════════════════════════════════
            PAGE: PROMOTIONS
       ═══════════════════════════════════════ -->
@@ -1361,175 +1093,7 @@ $orders_today = $row_today['total_today'];
           </div>
         </div>
         <!-- /PAGE PROMOTIONS -->
-        <!-- ═══════════════════════════════════════
-           PAGE: SETTING
-═══════════════════════════════════════ -->
-        <div class="page" id="page-settings">
-          <div class="sec-header">
-            <div>
-              <div class="sec-title">Cài đặt hệ thống</div>
-              <div class="sec-sub">
-                Cấu hình thông tin cửa hàng và bảo mật
-              </div>
-            </div>
-          </div>
 
-          <div class="grid-2">
-            <!-- 🏪 THÔNG TIN CHUNG -->
-            <div class="card">
-              <div class="card-head">
-                <div class="card-title">Thông tin chung</div>
-              </div>
-              <div class="card-body" style="padding: 20px">
-                <div style="margin-bottom: 12px">
-                  <label>Tên cửa hàng</label>
-                  <input
-                    type="text"
-                    class="search-input"
-                    value="Văn Phòng UniStyle" />
-                </div>
-
-                <div style="margin-bottom: 12px">
-                  <label>Email</label>
-                  <input
-                    type="email"
-                    class="search-input"
-                    placeholder="example@gmail.com" />
-                </div>
-
-                <div style="margin-bottom: 12px">
-                  <label>Số điện thoại</label>
-                  <input
-                    type="text"
-                    class="search-input"
-                    placeholder="0123456789" />
-                </div>
-
-                <div style="margin-bottom: 12px">
-                  <label>Địa chỉ</label>
-                  <input
-                    type="text"
-                    class="search-input"
-                    placeholder="Địa chỉ cửa hàng" />
-                </div>
-
-                <button class="btn btn-primary">Lưu thay đổi</button>
-              </div>
-            </div>
-
-            <!-- 👤 TÀI KHOẢN -->
-            <div class="card">
-              <div class="card-head">
-                <div class="card-title">Tài khoản</div>
-              </div>
-              <div class="card-body" style="padding: 20px">
-                <p style="font-size: 13px; color: var(--text-secondary)">
-                  Quản lý mật khẩu và quyền truy cập của nhân viên.
-                </p>
-
-                <button class="btn" style="margin-top: 10px">
-                  Đổi mật khẩu
-                </button>
-                <button class="btn" style="margin-top: 10px">
-                  Quản lý nhân viên
-                </button>
-                <button class="btn" style="margin-top: 10px">
-                  Quản lý khách hàng
-                </button>
-              </div>
-            </div>
-
-            <!-- 💰 THANH TOÁN -->
-            <div class="card">
-              <div class="card-head">
-                <div class="card-title">Thanh toán</div>
-              </div>
-              <div class="card-body" style="padding: 20px">
-                <label>
-                  <input type="checkbox" checked /> COD (Thanh toán khi nhận
-                  hàng) </label><br />
-
-                <label>
-                  <input type="checkbox" /> Chuyển khoản ngân hàng
-                </label>
-
-                <div style="margin-top: 10px">
-                  <input
-                    type="text"
-                    class="search-input"
-                    placeholder="Số tài khoản" />
-                </div>
-
-                <button class="btn btn-primary" style="margin-top: 10px">
-                  Lưu
-                </button>
-              </div>
-            </div>
-
-            <!-- 🚚 VẬN CHUYỂN -->
-            <div class="card">
-              <div class="card-head">
-                <div class="card-title">Vận chuyển</div>
-              </div>
-              <div class="card-body" style="padding: 20px">
-                <div style="margin-bottom: 10px">
-                  <label>Phí ship</label>
-                  <input
-                    type="number"
-                    class="search-input"
-                    placeholder="30000" />
-                </div>
-
-                <label>
-                  <input type="checkbox" /> Miễn phí ship đơn trên 500k
-                </label>
-
-                <button class="btn btn-primary" style="margin-top: 10px">
-                  Lưu
-                </button>
-              </div>
-            </div>
-
-            <!-- 🎨 GIAO DIỆN -->
-            <div class="card">
-              <div class="card-head">
-                <div class="card-title">Giao diện</div>
-              </div>
-              <div class="card-body" style="padding: 20px">
-                <div style="margin-bottom: 10px">
-                  <label>Upload Banner</label>
-                  <input type="file" />
-                </div>
-
-                <div style="margin-bottom: 10px">
-                  <label>Màu chủ đạo</label>
-                  <input type="color" />
-                </div>
-
-                <button class="btn btn-primary">Lưu</button>
-              </div>
-            </div>
-
-            <!-- 🔒 BẢO MẬT -->
-            <div class="card">
-              <div class="card-head">
-                <div class="card-title">Bảo mật</div>
-              </div>
-              <div class="card-body" style="padding: 20px">
-                <label>
-                  <input type="checkbox" /> Xác thực 2 bước (2FA) </label><br />
-
-                <label>
-                  <input type="checkbox" /> Đăng xuất tất cả thiết bị
-                </label>
-
-                <button class="btn btn-danger" style="margin-top: 10px">
-                  Áp dụng
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
       </main>
       <!-- /CONTENT -->
     </div>
@@ -1538,6 +1102,142 @@ $orders_today = $row_today['total_today'];
   <!-- /SHELL -->
 
 
+  <!-- ═══════════ MODAL CHI TIẾT ĐƠN HÀNG ═══════════ -->
+  <div class="modal-overlay" id="order-modal-overlay" onclick="closeOrderModal(event)">
+    <div class="modal-box" id="order-modal-box">
+
+      <!-- Header -->
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="modal-order-id">Chi tiết đơn hàng</div>
+          <div id="modal-order-status-wrap"></div>
+        </div>
+        <button class="modal-close" onclick="closeOrderModal(true)">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M2 2l12 12M14 2L2 14" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body" id="modal-body">
+        <div class="modal-loading">Đang tải...</div>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer" id="modal-footer"></div>
+
+    </div>
+  </div>
+  <!-- /MODAL -->
+
+
+  <!-- ═══════════ MODAL SẢN PHẨM (Thêm / Sửa) ═══════════ -->
+  <div class="modal-overlay" id="prod-modal-overlay" onclick="closeProdModal(event)">
+    <div class="modal-box" style="max-width:580px">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="prod-modal-title">Thêm sản phẩm</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px" id="prod-modal-sub"></div>
+        </div>
+        <button class="modal-close" onclick="closeProdModal(true)">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M2 2l12 12M14 2L2 14" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" id="prod-modal-body">
+        <div class="modal-loading">
+          <div class="modal-spinner"></div> Đang tải...
+        </div>
+      </div>
+      <div class="modal-footer" id="prod-modal-footer"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════ MODAL NHẬP KHO ═══════════ -->
+  <div class="modal-overlay" id="nhapkho-modal-overlay" onclick="closeNhapKhoModal(event)">
+    <div class="modal-box" style="max-width:400px">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">Nhập kho</div>
+          <div class="modal-title" style="font-size:13px;font-weight:400;color:var(--text-muted)" id="nhapkho-tensp"></div>
+        </div>
+        <button class="modal-close" onclick="closeNhapKhoModal(true)">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M2 2l12 12M14 2L2 14" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="nhapkho-masp">
+        <div style="margin-bottom:14px">
+          <label class="form-label">Tồn kho hiện tại</label>
+          <div id="nhapkho-hientai" style="font-size:20px;font-weight:600;color:var(--accent-mid);margin-top:4px">—</div>
+        </div>
+        <div>
+          <label class="form-label">Số lượng nhập thêm</label>
+          <input type="number" id="nhapkho-soluong" class="form-input" min="1" value="10" placeholder="Nhập số lượng...">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeNhapKhoModal(true)">Hủy</button>
+        <button class="btn btn-primary" onclick="submitNhapKho()">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M8 2v12M2 8l6 6 6-6" />
+          </svg>
+          Xác nhận nhập kho
+        </button>
+      </div>
+    </div>
+  </div>
+  <div id="toast-container" style="position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px"></div>
+
+  <!-- ═══════════ MODAL XEM SẢN PHẨM ═══════════ -->
+  <div class="modal-overlay" id="sp-view-overlay" onclick="closeSpView(event)">
+    <div class="modal-box" style="max-width:620px">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="sp-view-title">Chi tiết sản phẩm</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:3px" id="sp-view-sub"></div>
+        </div>
+        <button class="modal-close" onclick="closeSpView(true)">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M2 2l12 12M14 2L2 14" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" id="sp-view-body">
+        <div class="modal-loading">
+          <div class="modal-spinner"></div> Đang tải...
+        </div>
+      </div>
+      <div class="modal-footer" id="sp-view-footer"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════ MODAL THÊM / SỬA SẢN PHẨM ═══════════ -->
+  <div class="modal-overlay" id="sp-form-overlay" onclick="closeSpForm(event)">
+    <div class="modal-box" style="max-width:600px">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="sp-form-title">Thêm sản phẩm mới</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:3px" id="sp-form-sub"></div>
+        </div>
+        <button class="modal-close" onclick="closeSpForm(true)">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M2 2l12 12M14 2L2 14" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" id="sp-form-body">
+        <div class="modal-loading">
+          <div class="modal-spinner"></div> Đang tải...
+        </div>
+      </div>
+      <div class="modal-footer" id="sp-form-footer"></div>
+    </div>
+  </div>
 </body>
 
 </html>

@@ -130,12 +130,7 @@ function getSanPham($conn, $madh)
             <td><?= renderTrangThai($row['trangthai']) ?></td>
             <td>
                 <div class="actions">
-                    <button class="act-btn">Xem</button>
-                    <?php if ($row['trangthai'] === 'Chờ xử lý'): ?>
-                        <button class="act-btn">Duyệt</button>
-                    <?php elseif ($row['trangthai'] === 'Đang giao'): ?>
-                        <button class="act-btn">Track</button>
-                    <?php endif; ?>
+                    <button class="act-btn" onclick="openOrderModal(<?= $row['madh'] ?>)">Xem</button>
                 </div>
             </td>
         </tr>
