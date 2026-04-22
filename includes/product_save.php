@@ -1,7 +1,15 @@
 <?php
+ob_start();
 ini_set('display_errors', 0);
-header('Content-Type: application/json; charset=utf-8');
+error_reporting(0);
 require_once __DIR__ . '/../config/db.php';
+$__buf = ob_get_clean();
+if ($__buf) {
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(['ok' => false, 'error' => 'PHP error: ' . strip_tags(trim($__buf))]);
+    exit;
+}
+header('Content-Type: application/json; charset=utf-8');
 
 $masp    = isset($_POST['MaSP'])      ? (int)$_POST['MaSP'] : 0;
 $tensp   = trim($_POST['TenSP']       ?? '');

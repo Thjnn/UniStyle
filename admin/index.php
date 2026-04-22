@@ -576,163 +576,43 @@ $orders_today = $row_today['total_today'];
           <div class="sec-header">
             <div>
               <div class="sec-title">Quản lý khách hàng</div>
-              <div class="sec-sub">1.842 khách hàng đã đăng ký</div>
+              <div class="sec-sub" id="kh-sub-count">Đang tải...</div>
             </div>
             <div class="sec-actions">
-              <button class="btn">Xuất danh sách</button>
-              <button class="btn btn-primary">+ Thêm khách hàng</button>
+              <div class="export-dropdown" id="export-kh-dd">
+                <button class="btn" onclick="toggleExportKhDD()" style="display:flex;align-items:center;gap:6px">
+                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+                    <path d="M13 10v4H3v-4M8 2v8M5 5l3 3 3-3" />
+                  </svg>
+                  Xuất danh sách
+                  <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <path d="M4 6l4 4 4-4" />
+                  </svg>
+                </button>
+                <div class="export-dd-menu" id="export-kh-dd-menu">
+                  <button class="export-dd-item" onclick="exportKhExcel('excel');toggleExportKhDD(false)">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#166534" stroke-width="1.8" stroke-linecap="round">
+                      <rect x="2" y="2" width="12" height="12" rx="2" />
+                      <path d="M5 6l2 4 2-4M11 6v4" />
+                    </svg>
+                    Xuất Excel (.xls)
+                  </button>
+                  <button class="export-dd-item" onclick="exportKhExcel('csv');toggleExportKhDD(false)">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#1d4ed8" stroke-width="1.8" stroke-linecap="round">
+                      <path d="M3 4h10M3 8h7M3 12h5" />
+                    </svg>
+                    Xuất CSV (.csv)
+                  </button>
+                </div>
+              </div>
+              <button class="btn btn-primary" onclick="openKhForm(0)">+ Thêm khách hàng</button>
             </div>
           </div>
 
 
 
-          <div class="card card-full">
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Khách hàng</th>
-                    <th>Loại</th>
-                    <th>Số điện thoại</th>
-                    <th>Email</th>
-                    <th>Tổng đơn</th>
-                    <th>Tổng chi tiêu</th>
-                    <th>Lần cuối mua</th>
-                    <th>Thao tác</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <div class="td-flex">
-                        <div
-                          class="cust-avatar"
-                          style="background: #eff6ff; color: #1d4ed8">
-                          NA
-                        </div>
-                        Nguyễn Văn An
-                      </div>
-                    </td>
-                    <td><span class="badge badge-gray">Cá nhân</span></td>
-                    <td>0901 234 567</td>
-                    <td style="color: var(--text-secondary)">
-                      van.an@gmail.com
-                    </td>
-                    <td>24</td>
-                    <td><strong>8,4tr</strong></td>
-                    <td>Hôm nay</td>
-                    <td>
-                      <div class="actions">
-                        <button class="act-btn">Xem</button><button class="act-btn">Đơn hàng</button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="td-flex">
-                        <div
-                          class="cust-avatar"
-                          style="background: #f0fdf4; color: #16a34a">
-                          HP
-                        </div>
-                        Cty TNHH Hoàng Phát
-                      </div>
-                    </td>
-                    <td>
-                      <span class="badge badge-blue">Doanh nghiệp</span>
-                    </td>
-                    <td>028 3849 5566</td>
-                    <td style="color: var(--text-secondary)">
-                      mua.hang@hoanphat.vn
-                    </td>
-                    <td>186</td>
-                    <td><strong>124,6tr</strong></td>
-                    <td>13/03/2026</td>
-                    <td>
-                      <div class="actions">
-                        <button class="act-btn">Xem</button><button class="act-btn">Đơn hàng</button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="td-flex">
-                        <div
-                          class="cust-avatar"
-                          style="background: #eff6ff; color: #1d4ed8">
-                          TM
-                        </div>
-                        Trần Thị Mai
-                      </div>
-                    </td>
-                    <td><span class="badge badge-gray">Cá nhân</span></td>
-                    <td>0912 345 678</td>
-                    <td style="color: var(--text-secondary)">
-                      tran.mai@email.com
-                    </td>
-                    <td>41</td>
-                    <td><strong>18,2tr</strong></td>
-                    <td>14/03/2026</td>
-                    <td>
-                      <div class="actions">
-                        <button class="act-btn">Xem</button><button class="act-btn">Đơn hàng</button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="td-flex">
-                        <div
-                          class="cust-avatar"
-                          style="background: #fef9c3; color: #854d0e">
-                          BV
-                        </div>
-                        Phòng HC — Bảo Việt Group
-                      </div>
-                    </td>
-                    <td><span class="badge badge-vip">VIP</span></td>
-                    <td>024 3826 1234</td>
-                    <td style="color: var(--text-secondary)">
-                      hanhchinh@baoviet.vn
-                    </td>
-                    <td>410</td>
-                    <td><strong>380,2tr</strong></td>
-                    <td>12/03/2026</td>
-                    <td>
-                      <div class="actions">
-                        <button class="act-btn">Xem</button><button class="act-btn">Đơn hàng</button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="td-flex">
-                        <div
-                          class="cust-avatar"
-                          style="background: #fef2f2; color: #dc2626">
-                          MK
-                        </div>
-                        Vũ Minh Khoa
-                      </div>
-                    </td>
-                    <td><span class="badge badge-gray">Cá nhân</span></td>
-                    <td>0933 456 789</td>
-                    <td style="color: var(--text-secondary)">
-                      minh.khoa@gmail.com
-                    </td>
-                    <td>8</td>
-                    <td><strong>2,1tr</strong></td>
-                    <td>12/03/2026</td>
-                    <td>
-                      <div class="actions">
-                        <button class="act-btn">Xem</button><button class="act-btn">Đơn hàng</button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <?php require_once __DIR__ . '/../includes/customers_table.php'; ?>
+
         </div>
         <!-- /PAGE CUSTOMERS -->
 
@@ -743,224 +623,40 @@ $orders_today = $row_today['total_today'];
           <div class="sec-header">
             <div>
               <div class="sec-title">Quản lý kho hàng</div>
-              <div class="sec-sub">5 mặt hàng cần nhập kho gấp</div>
+              <div class="sec-sub" id="inv-sub">Đang tải...</div>
             </div>
             <div class="sec-actions">
-              <button class="btn">Lịch sử nhập kho</button>
-              <button class="btn btn-primary">+ Phiếu nhập kho</button>
+              <div class="export-dropdown" id="export-inv-dd">
+                <button class="btn" onclick="toggleExportInvDD()" style="display:flex;align-items:center;gap:6px">
+                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+                    <path d="M13 10v4H3v-4M8 2v8M5 5l3 3 3-3" />
+                  </svg>
+                  Xuất báo cáo
+                  <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <path d="M4 6l4 4 4-4" />
+                  </svg>
+                </button>
+                <div class="export-dd-menu" id="export-inv-dd-menu">
+                  <button class="export-dd-item" onclick="exportInv('excel');toggleExportInvDD(false)">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#166534" stroke-width="1.8" stroke-linecap="round">
+                      <rect x="2" y="2" width="12" height="12" rx="2" />
+                      <path d="M5 6l2 4 2-4M11 6v4" />
+                    </svg>
+                    Xuất Excel (.xls)
+                  </button>
+                  <button class="export-dd-item" onclick="exportInv('csv');toggleExportInvDD(false)">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#1d4ed8" stroke-width="1.8" stroke-linecap="round">
+                      <path d="M3 4h10M3 8h7M3 12h5" />
+                    </svg>
+                    Xuất CSV (.csv)
+                  </button>
+                </div>
+              </div>
+              <button class="btn btn-primary" onclick="openBulkNhapKho()">+ Phiếu nhập kho</button>
             </div>
           </div>
 
-          <!-- KPI 3-col -->
-          <div class="kpi-grid-3">
-            <div class="kpi-card">
-              <div class="kpi-header">
-                <span class="kpi-label">Tổng SKU quản lý</span>
-                <div class="kpi-icon" style="background: var(--accent-light)">
-                  <svg
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    stroke="#1d4ed8"
-                    stroke-width="1.6"
-                    stroke-linecap="round">
-                    <rect x="2" y="2" width="5" height="5" rx="1" />
-                    <rect x="9" y="2" width="5" height="5" rx="1" />
-                    <rect x="2" y="9" width="5" height="5" rx="1" />
-                    <rect x="9" y="9" width="5" height="5" rx="1" />
-                  </svg>
-                </div>
-              </div>
-              <div class="kpi-value">148</div>
-              <div class="kpi-foot">
-                <span class="kpi-period">Đang kinh doanh</span>
-              </div>
-            </div>
-
-            <div class="kpi-card" style="border-color: #fca5a5">
-              <div class="kpi-header">
-                <span class="kpi-label">Cần nhập kho gấp</span>
-                <div class="kpi-icon" style="background: var(--danger-bg)">
-                  <svg
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    stroke="#dc2626"
-                    stroke-width="1.6"
-                    stroke-linecap="round">
-                    <path d="M8 2v7M8 12v1.5" />
-                    <circle cx="8" cy="8" r="6.5" />
-                  </svg>
-                </div>
-              </div>
-              <div class="kpi-value" style="color: var(--danger)">5</div>
-              <div class="kpi-foot">
-                <span class="kpi-change trend-down">3 hết hàng, 2 sắp hết</span>
-              </div>
-            </div>
-
-            <div class="kpi-card">
-              <div class="kpi-header">
-                <span class="kpi-label">Giá trị tồn kho</span>
-                <div class="kpi-icon" style="background: #f0fdf4">
-                  <svg
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    stroke="#16a34a"
-                    stroke-width="1.6"
-                    stroke-linecap="round">
-                    <path d="M2 14L5.5 8l3 4 3-6 2 3" />
-                  </svg>
-                </div>
-              </div>
-              <div class="kpi-value">342,1tr</div>
-              <div class="kpi-foot">
-                <span class="kpi-change trend-up">▲ 5,8%</span>
-                <span class="kpi-period">tháng này</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="card card-full">
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Sản phẩm</th>
-                    <th>Tồn kho</th>
-                    <th>Mức tối thiểu</th>
-                    <th>Mức tối đa</th>
-                    <th>Giá nhập</th>
-                    <th>Nhà cung cấp</th>
-                    <th>Trạng thái</th>
-                    <th>Thao tác</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <div class="td-flex">
-                        <div class="prod-thumb">🖊️</div>
-                        <div>
-                          <div class="prod-name">
-                            Bút mực Pentel EnerGel 0.5
-                          </div>
-                          <div class="prod-sku">SKU: BPN-EG-05</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td style="color: var(--danger); font-weight: 700">18</td>
-                    <td>50</td>
-                    <td>500</td>
-                    <td>18.000đ</td>
-                    <td style="color: var(--text-secondary)">Pentel VN</td>
-                    <td><span class="badge badge-red">Cần nhập</span></td>
-                    <td><button class="act-btn">Nhập kho</button></td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="td-flex">
-                        <div class="prod-thumb">✏️</div>
-                        <div>
-                          <div class="prod-name">
-                            Bút chì 2B Staedtler (hộp)
-                          </div>
-                          <div class="prod-sku">SKU: BC-STD-2B</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td style="color: var(--danger); font-weight: 700">8</td>
-                    <td>30</td>
-                    <td>300</td>
-                    <td>42.000đ</td>
-                    <td style="color: var(--text-secondary)">Staedtler VN</td>
-                    <td><span class="badge badge-red">Cần nhập</span></td>
-                    <td><button class="act-btn">Nhập kho</button></td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="td-flex">
-                        <div class="prod-thumb">🗂️</div>
-                        <div>
-                          <div class="prod-name">
-                            Bìa file A4 Deli EG17150
-                          </div>
-                          <div class="prod-sku">SKU: BF-EG17150</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td style="color: var(--danger); font-weight: 700">0</td>
-                    <td>50</td>
-                    <td>400</td>
-                    <td>7.800đ</td>
-                    <td style="color: var(--text-secondary)">Deli VN</td>
-                    <td><span class="badge badge-red">Hết hàng</span></td>
-                    <td><button class="act-btn">Nhập kho</button></td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="td-flex">
-                        <div class="prod-thumb">📒</div>
-                        <div>
-                          <div class="prod-name">
-                            Tập học sinh Hồng Hà 96tr
-                          </div>
-                          <div class="prod-sku">SKU: TAP-HH-96</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td style="color: var(--warning); font-weight: 600">
-                      120
-                    </td>
-                    <td>100</td>
-                    <td>1000</td>
-                    <td>5.500đ</td>
-                    <td style="color: var(--text-secondary)">Hồng Hà</td>
-                    <td><span class="badge badge-amber">Sắp hết</span></td>
-                    <td><button class="act-btn">Nhập kho</button></td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="td-flex">
-                        <div class="prod-thumb">✏️</div>
-                        <div>
-                          <div class="prod-name">
-                            Bút bi Thiên Long TL-027
-                          </div>
-                          <div class="prod-sku">SKU: BTL-027-XNH</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>450</td>
-                    <td>100</td>
-                    <td>2000</td>
-                    <td>6.200đ</td>
-                    <td style="color: var(--text-secondary)">Thiên Long</td>
-                    <td><span class="badge badge-green">Đủ hàng</span></td>
-                    <td><button class="act-btn">Xem</button></td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="td-flex">
-                        <div class="prod-thumb">📎</div>
-                        <div>
-                          <div class="prod-name">
-                            Kẹp bướm Deli 51mm (hộp)
-                          </div>
-                          <div class="prod-sku">SKU: KBD-51-12</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>180</td>
-                    <td>50</td>
-                    <td>500</td>
-                    <td>15.000đ</td>
-                    <td style="color: var(--text-secondary)">Deli VN</td>
-                    <td><span class="badge badge-green">Đủ hàng</span></td>
-                    <td><button class="act-btn">Xem</button></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <?php require_once __DIR__ . '/../includes/inventory_table.php'; ?>
         </div>
         <!-- /PAGE INVENTORY -->
 
@@ -972,125 +668,25 @@ $orders_today = $row_today['total_today'];
           <div class="sec-header">
             <div>
               <div class="sec-title">Chương trình Khuyến mãi</div>
-              <div class="sec-sub">
-                Quản lý mã giảm giá và chiến dịch marketing
-              </div>
+              <div class="sec-sub">Quản lý mã voucher và chiến dịch marketing</div>
             </div>
             <div class="sec-actions">
-              <button class="btn btn-primary">+ Tạo khuyến mãi mới</button>
+              <button class="btn" onclick="openCampaignForm(0)" style="display:flex;align-items:center;gap:6px">
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <path d="M8 2v12M2 8h12" />
+                </svg>
+                Tạo chiến dịch
+              </button>
+              <button class="btn btn-primary" onclick="openVoucherForm(0)" style="display:flex;align-items:center;gap:6px">
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <path d="M8 2v12M2 8h12" />
+                </svg>
+                Tạo voucher mới
+              </button>
             </div>
           </div>
-          <div class="card card-full">
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Tên chương trình</th>
-                    <th>Mã</th>
-                    <th>Giảm giá</th>
-                    <th>Thời hạn</th>
-                    <th>Trạng thái</th>
-                    <th>Thao tác</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><strong>Ưu đãi Hè 2026</strong></td>
-                    <td>
-                      <code
-                        style="background: var(--bg-page); padding: 2px 5px">SUMMER26</code>
-                    </td>
-                    <td>15%</td>
-                    <td>01/06 - 30/08</td>
-                    <td><span class="badge badge-green">Đang chạy</span></td>
-                    <td>
-                      <button class="act-btn">Sửa</button>
-                      <button class="act-btn">Xóa</button>
-                    </td>
-                  </tr>
 
-                  <tr>
-                    <td><strong>Back To School</strong></td>
-                    <td>
-                      <code
-                        style="background: var(--bg-page); padding: 2px 5px">SCHOOL10</code>
-                    </td>
-                    <td>10%</td>
-                    <td>01/08 - 15/09</td>
-                    <td><span class="badge badge-green">Đang chạy</span></td>
-                    <td>
-                      <button class="act-btn">Sửa</button>
-                      <button class="act-btn">Xóa</button>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td><strong>Giảm giá giày Sneaker</strong></td>
-                    <td>
-                      <code
-                        style="background: var(--bg-page); padding: 2px 5px">SHOE50K</code>
-                    </td>
-                    <td>-50.000đ</td>
-                    <td>10/03 - 10/04</td>
-                    <td>
-                      <span class="badge badge-yellow">Sắp diễn ra</span>
-                    </td>
-                    <td>
-                      <button class="act-btn">Sửa</button>
-                      <button class="act-btn">Xóa</button>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td><strong>Freeship toàn quốc</strong></td>
-                    <td>
-                      <code
-                        style="background: var(--bg-page); padding: 2px 5px">FREESHIP</code>
-                    </td>
-                    <td>Miễn phí vận chuyển</td>
-                    <td>01/01 - 31/12</td>
-                    <td><span class="badge badge-green">Đang chạy</span></td>
-                    <td>
-                      <button class="act-btn">Sửa</button>
-                      <button class="act-btn">Xóa</button>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td><strong>Flash Sale Cuối Tuần</strong></td>
-                    <td>
-                      <code
-                        style="background: var(--bg-page); padding: 2px 5px">FLASH20</code>
-                    </td>
-                    <td>20%</td>
-                    <td>Thứ 7 - Chủ nhật</td>
-                    <td><span class="badge badge-red">Đã kết thúc</span></td>
-                    <td>
-                      <button class="act-btn">Sửa</button>
-                      <button class="act-btn">Xóa</button>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td><strong>Combo Balo + VPP</strong></td>
-                    <td>
-                      <code
-                        style="background: var(--bg-page); padding: 2px 5px">COMBO30</code>
-                    </td>
-                    <td>30%</td>
-                    <td>05/04 - 20/04</td>
-                    <td>
-                      <span class="badge badge-yellow">Sắp diễn ra</span>
-                    </td>
-                    <td>
-                      <button class="act-btn">Sửa</button>
-                      <button class="act-btn">Xóa</button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <?php require_once __DIR__ . '/../includes/promotions_table.php'; ?>
         </div>
         <!-- /PAGE PROMOTIONS -->
 
@@ -1236,6 +832,161 @@ $orders_today = $row_today['total_today'];
         </div>
       </div>
       <div class="modal-footer" id="sp-form-footer"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════ MODAL XEM KHÁCH HÀNG ═══════════ -->
+  <div class="modal-overlay" id="kh-view-overlay" onclick="closeKhView(event)">
+    <div class="modal-box" style="max-width:640px">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="kh-view-title">Chi tiết khách hàng</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:3px" id="kh-view-sub"></div>
+        </div>
+        <button class="modal-close" onclick="closeKhView(true)">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M2 2l12 12M14 2L2 14" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" id="kh-view-body">
+        <div class="modal-loading">
+          <div class="modal-spinner"></div> Đang tải...
+        </div>
+      </div>
+      <div class="modal-footer" id="kh-view-footer"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════ MODAL FORM KHÁCH HÀNG ═══════════ -->
+  <div class="modal-overlay" id="kh-form-overlay" onclick="closeKhForm(event)">
+    <div class="modal-box" style="max-width:560px">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="kh-form-title">Thêm khách hàng</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:3px" id="kh-form-sub"></div>
+        </div>
+        <button class="modal-close" onclick="closeKhForm(true)">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M2 2l12 12M14 2L2 14" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" id="kh-form-body"></div>
+      <div class="modal-footer" id="kh-form-footer"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════ MODAL XEM VOUCHER / CAMPAIGN ═══════════ -->
+  <div class="modal-overlay" id="promo-view-overlay" onclick="closePromoView(event)">
+    <div class="modal-box" style="max-width:560px">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="promo-view-title">Chi tiết voucher</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:3px" id="promo-view-sub"></div>
+        </div>
+        <button class="modal-close" onclick="closePromoView(true)">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M2 2l12 12M14 2L2 14" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" id="promo-view-body">
+        <div class="modal-loading">
+          <div class="modal-spinner"></div> Đang tải...
+        </div>
+      </div>
+      <div class="modal-footer" id="promo-view-footer"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════ MODAL FORM VOUCHER / CAMPAIGN ═══════════ -->
+  <div class="modal-overlay" id="promo-form-overlay" onclick="closePromoForm(event)">
+    <div class="modal-box" style="max-width:580px">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="promo-form-title">Tạo voucher mới</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:3px" id="promo-form-sub"></div>
+        </div>
+        <button class="modal-close" onclick="closePromoForm(true)">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M2 2l12 12M14 2L2 14" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" id="promo-form-body"></div>
+      <div class="modal-footer" id="promo-form-footer"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════ MODAL PHIẾU NHẬP KHO HÀNG LOẠT ═══════════ -->
+  <div class="modal-overlay" id="bulk-nhapkho-overlay" onclick="closeBulkNhapKho(event)">
+    <div class="modal-box" style="max-width:640px">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">📋 Phiếu Nhập Kho</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px" id="bulk-phieu-so"></div>
+        </div>
+        <button class="modal-close" onclick="closeBulkNhapKho(true)">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M2 2l12 12M14 2L2 14" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Thông tin phiếu -->
+        <div class="form-row-2" style="margin-bottom:16px">
+          <div class="form-group">
+            <label class="form-label">Nhà cung cấp</label>
+            <input type="text" id="bulk-ncc" class="form-input" placeholder="Tên nhà cung cấp...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ngày nhập</label>
+            <input type="date" id="bulk-ngay" class="form-input">
+          </div>
+          <div class="form-group" style="grid-column:1/-1">
+            <label class="form-label">Ghi chú</label>
+            <textarea id="bulk-ghichu" class="form-input" rows="2" placeholder="Ghi chú phiếu nhập..."></textarea>
+          </div>
+        </div>
+
+        <!-- Tìm & thêm sản phẩm -->
+        <div class="form-group" style="margin-bottom:12px">
+          <label class="form-label">Thêm sản phẩm vào phiếu</label>
+          <input type="text" id="bulk-sp-search" class="form-input"
+            placeholder="Gõ tên sản phẩm để tìm kiếm..."
+            oninput="bulkSpSearch(this.value)">
+          <div id="bulk-sp-results" style="display:none;margin-top:6px;border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;max-height:180px;overflow-y:auto;background:var(--bg-card)"></div>
+        </div>
+
+        <!-- Danh sách SP trong phiếu -->
+        <div class="modal-section-title" style="margin-bottom:8px">Danh sách nhập kho</div>
+        <div id="bulk-items-list">
+          <div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">
+            Chưa có sản phẩm. Tìm kiếm và thêm sản phẩm vào phiếu.
+          </div>
+        </div>
+        <div class="phieu-preview" id="bulk-total-row" style="display:none;margin-top:12px">
+          <div class="phieu-preview-row">
+            <span>Tổng số lượng</span>
+            <strong id="bulk-total-sp">0</strong>
+          </div>
+          <div class="phieu-preview-row" id="preview-tong-wrap" style="display:none">
+            <span>Tổng giá trị nhập</span>
+            <strong id="bulk-total-tien" style="color:var(--accent-mid)">—</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn" onclick="closeBulkNhapKho(true)">Hủy</button>
+        <button class="btn btn-primary" id="bulk-submit-btn" onclick="submitBulkNhapKho()">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M2 8l4 4 8-8" />
+          </svg>
+          Xác nhận nhập kho
+        </button>
+      </div>
     </div>
   </div>
 </body>
