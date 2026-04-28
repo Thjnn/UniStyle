@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once "./config/db.php";
+require_once __DIR__ . "/includes/banner.php";
 
 // ══════════════════════════════════════════════════════════
 //  KHỞI TẠO BIẾN
@@ -354,6 +355,7 @@ if (isset($_GET['ajax_suggest'])) {
             cursor: pointer;
         }
     </style>
+    <link rel="stylesheet" href="./assets/css/banner_slider.css">
 </head>
 
 <body>
@@ -565,8 +567,9 @@ if (isset($_GET['ajax_suggest'])) {
 
         <!-- Nội dung shop -->
         <div class="shop-content">
+            <!-- Shop Banner — từ Dashboard -->
             <div class="shop-banner">
-                <img src="./assets/file_anh/1920_x_600___cta__1_d652d361086646d3b12a89b38ce6c294.jpg" />
+                <?php echo render_banner('banner_top', './assets/file_anh/'); ?>
             </div>
 
             <!-- ── Thanh kết quả tìm kiếm ── -->
@@ -908,6 +911,7 @@ if (isset($_GET['ajax_suggest'])) {
         })();
     </script>
 
+    <script src="./assets/js/banner_slider.js"></script>
 </body>
 
 </html>

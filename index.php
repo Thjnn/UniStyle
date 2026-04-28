@@ -2,6 +2,7 @@
 include("session.php");
 
 include("./config/db.php");
+require_once __DIR__ . "/includes/banner.php";
 
 // ── Lấy từ khóa tìm kiếm ─────────────────────────────────
 $keyword = trim($_GET['keyword'] ?? '');
@@ -316,6 +317,7 @@ if (!empty($_SESSION['cart'])) {
       cursor: pointer;
     }
   </style>
+  <link rel="stylesheet" href="./assets/css/banner_slider.css">
 </head>
 
 <body>
@@ -620,13 +622,9 @@ if (!empty($_SESSION['cart'])) {
         <a href="shop.php" class="see-more-btn">Xem thêm sản phẩm</a>
       </div>
     </section>
-    <!-- Back To School Banner -->
+    <!-- Back To School Banner — từ Dashboard -->
     <section class="backtoschool-banner">
-      <a href="#!">
-        <img
-          src="./assets/file_anh/1920_x_600___cta___6_.webp"
-          alt="Back To School Sale" />
-      </a>
+      <?php echo render_banner('banner_home', './assets/file_anh/'); ?>
     </section>
     <!-- Policy -->
     <section class="store-policy">
@@ -674,13 +672,9 @@ if (!empty($_SESSION['cart'])) {
         </div>
       </div>
     </section>
-    <!-- Banner Charity -->
+    <!-- Banner 2 — từ Dashboard -->
     <section class="charity-banner">
-      <a href="#!">
-        <img
-          src="./assets/file_anh/8wthty42wz8modg-784-he-thong-tu-thien-fly-to-sky-cong-ty-tnhh-doanh-nghiep-xa-hoi-tu-thien-va-ho-tro-phat-trien-cong-dong-fly-to-sky.png"
-          alt="Back To School Sale" />
-      </a>
+      <?php echo render_banner('banner_home_2', './assets/file_anh/'); ?>
     </section>
     <!-- Featured Products 2 -->
     <section class="section">
@@ -844,12 +838,9 @@ if (!empty($_SESSION['cart'])) {
         </div>
       </div>
     </section> -->
+    <!-- Banner 2 — từ Dashboard -->
     <section class="charity-banner">
-      <a href="#!">
-        <img
-          src="./assets/file_anh/1920_x_600___cta__1_d652d361086646d3b12a89b38ce6c294.jpg"
-          alt="Back To School Sale" />
-      </a>
+      <?php echo render_banner('banner_home_3', './assets/file_anh/'); ?>
     </section>
   </div>
 
@@ -1086,6 +1077,7 @@ if (!empty($_SESSION['cart'])) {
       });
     };
   </script>
+  <script src="./assets/js/banner_slider.js"></script>
 </body>
 
 </html>

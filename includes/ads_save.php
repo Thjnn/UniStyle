@@ -22,7 +22,7 @@ $start   = trim($_POST['ngay_bat_dau']  ?? '') ?: 'NULL';
 $end     = trim($_POST['ngay_ket_thuc'] ?? '') ?: 'NULL';
 $hinhanh = trim($_POST['hinh_cu']  ?? '');
 
-$valid_vt = ['banner_top', 'banner_home', 'popup', 'sidebar'];
+$valid_vt = ['banner_top', 'banner_home', 'banner_home_2', 'banner_home_3', 'popup', 'sidebar'];
 if (!$ten) {
     echo json_encode(['ok' => false, 'error' => 'Tên quảng cáo không được để trống']);
     exit;

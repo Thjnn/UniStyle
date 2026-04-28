@@ -50,10 +50,12 @@ $kpi = $conn->query("
 ")->fetch_assoc() ?? ['tong' => 0, 'dang_chay' => 0, 'tam_dung' => 0];
 
 $vitri_labels = [
-    'banner_top'  => '🔝 Banner Top',
-    'banner_home' => '🏠 Banner Home',
-    'popup'       => '💬 Popup',
-    'sidebar'     => '📌 Sidebar',
+    'banner_top'    => '🔝 Banner Top (Trang Shop)',
+    'banner_home'   => '🏠 Banner Home 1 (Chính)',
+    'banner_home_2' => '🏠 Banner Home 2 (Giữa trang)',
+    'banner_home_3' => '🏠 Banner Home 3 (Cuối trang)',
+    'popup'         => '💬 Popup',
+    'sidebar'       => '📌 Sidebar',
 ];
 
 function fmt_date($d)

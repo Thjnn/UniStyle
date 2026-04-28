@@ -2,35 +2,38 @@
 
 /**
  * banner.php — Include dùng chung cho tất cả trang front-end
- * Cách dùng:
- *   require_once 'banner.php';
- *   echo render_banner('banner_home');   // trang chủ
- *   echo render_banner('banner_top');    // trang shop
+ * Đặt vào: includes/banner.php
  *
- * Tự tạo bảng quangcao nếu chưa có.
+ * Cách dùng (trong index.php, shop.php...):
+ *   require_once __DIR__ . '/includes/banner.php';
+ *   echo render_banner('banner_home');
+ *   echo render_banner('banner_top');
  */
 
-function render_banner(string $vi_tri, array $opts = []): string
+function render_banner(string $vi_tri, string $asset_base = './assets/file_anh/'): string
 {
     global $conn;
 
-    $default_imgs = [
-        'banner_home' => './assets/file_anh/1920_x_600___cta___6_.webp',
-        'banner_top'  => './assets/file_anh/1920_x_600___cta__1_d652d361086646d3b12a89b38ce6c294.jpg',
-        'popup'       => '',
-        'sidebar'     => '',
+    // ── Ảnh mặc định khi chưa có quảng cáo trong DB ─────────────────────────
+    $defaults = [
+        'banner_home'   => $asset_base . '1920_x_600___cta___6_.webp',
+        'banner_home_2' => $asset_base . '8wthty42wz8modg-784-he-thong-tu-thien-fly-to-sky-cong-ty-tnhh-doanh-nghiep-xa-hoi-tu-thien-va-ho-tro-phat-trien-cong-dong-fly-to-sky.png',
+        'banner_home_3' => $asset_base . '1920_x_600___cta__1_d652d361086646d3b12a89b38ce6c294.jpg',
+        'banner_top'    => $asset_base . '1920_x_600___cta__1_d652d361086646d3b12a89b38ce6c294.jpg',
+        'popup'         => '',
+        'sidebar'       => '',
     ];
 
-    // Đảm bảo bảng tồn tại
-    static $table_checked = false;
-    if (!$table_checked) {
+    // ── Tự tạo bảng nếu chưa có ─────────────────────────────────────────────
+    static $table_ok = false;
+    if (!$table_ok) {
         $conn->query("
             CREATE TABLE IF NOT EXISTS `quangcao` (
                 `id`             INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
                 `ten_qc`         VARCHAR(255) NOT NULL,
                 `hinh_anh`       VARCHAR(255) DEFAULT '',
                 `link`           VARCHAR(500) DEFAULT '',
-                `vi_tri`         ENUM('banner_top','banner_home','popup','sidebar') DEFAULT 'banner_home',
+                `vi_tri`         ENUM('banner_top','banner_home','banner_home_2','banner_home_3','popup','sidebar') DEFAULT 'banner_home',
                 `mo_ta`          TEXT,
                 `trang_thai`     TINYINT(1)   DEFAULT 1,
                 `thu_tu`         INT          DEFAULT 0,
@@ -39,13 +42,13 @@ function render_banner(string $vi_tri, array $opts = []): string
                 `created_at`     DATETIME     DEFAULT CURRENT_TIMESTAMP
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
         ");
-        $table_checked = true;
+        $table_ok = true;
     }
 
+    // ── Query banners đang hoạt động ─────────────────────────────────────────
     $vt    = $conn->real_escape_string($vi_tri);
     $today = date('Y-m-d');
 
-    // Query banners đang hoạt động, đúng vị trí, đúng thời hạn
     $res = $conn->query("
         SELECT id, ten_qc, hinh_anh, link
         FROM quangcao
@@ -58,66 +61,69 @@ function render_banner(string $vi_tri, array $opts = []): string
     ");
 
     $banners = [];
-    if ($res) {
-        while ($r = $res->fetch_assoc()) $banners[] = $r;
-    }
+    if ($res) while ($r = $res->fetch_assoc()) $banners[] = $r;
 
-    // Không có banner trong DB → dùng ảnh mặc định (fallback)
+    // ── Fallback: dùng ảnh mặc định nếu chưa có quảng cáo ──────────────────
     if (empty($banners)) {
-        $default = $default_imgs[$vi_tri] ?? '';
-        if (!$default) return '';
-        $banners = [[
-            'id'       => 0,
-            'ten_qc'   => '',
-            'hinh_anh' => $default,
-            'link'     => '',
-        ]];
+        $img = $defaults[$vi_tri] ?? '';
+        if (!$img) return ''; // không có fallback → không render gì
+        $banners = [['id' => 0, 'ten_qc' => '', 'hinh_anh' => $img, 'link' => '']];
     }
 
-    // ── Render ──────────────────────────────────────────────────────────────
+    // ── Tính src ảnh ─────────────────────────────────────────────────────────
+    foreach ($banners as &$b) {
+        $b['src'] = $b['id'] === 0
+            ? htmlspecialchars($b['hinh_anh'])                        // fallback: đường dẫn đầy đủ
+            : $asset_base . htmlspecialchars($b['hinh_anh']);         // từ DB: prefix assets
+    }
+    unset($b);
+
+    // ══════════════════════════════════════════════════════════════════════════
+    //  Chỉ 1 banner → render ảnh đơn giản
+    // ══════════════════════════════════════════════════════════════════════════
     if (count($banners) === 1) {
-        // Chỉ 1 banner → ảnh đơn giản
-        $b    = $banners[0];
-        $src  = $b['id'] === 0 ? htmlspecialchars($b['hinh_anh'])
-            : './assets/file_anh/' . htmlspecialchars($b['hinh_anh']);
-        $alt  = htmlspecialchars($b['ten_qc'] ?: 'Banner quảng cáo');
-        $wrap_open  = $b['link'] ? '<a href="' . htmlspecialchars($b['link']) . '" target="_blank">' : '<a href="#!">';
-        $wrap_close = '</a>';
-        return "$wrap_open<img src=\"$src\" alt=\"$alt\" style=\"width:100%;display:block\">$wrap_close";
+        $b   = $banners[0];
+        $alt = htmlspecialchars($b['ten_qc'] ?: 'Banner quảng cáo');
+        $href = $b['link'] ? htmlspecialchars($b['link']) : '#!';
+        $target = $b['link'] ? ' target="_blank"' : '';
+        return "<a href=\"{$href}\"{$target}>"
+            . "<img src=\"{$b['src']}\" alt=\"{$alt}\" style=\"width:100%;display:block\">"
+            . "</a>";
     }
 
-    // Nhiều banner → slider tự động
-    $uid = 'banner_' . substr(md5($vi_tri . microtime()), 0, 6);
+    // ══════════════════════════════════════════════════════════════════════════
+    //  Nhiều banner → Slider tự động
+    // ══════════════════════════════════════════════════════════════════════════
+    $uid = 'qcs_' . substr(md5($vi_tri . mt_rand()), 0, 7);
+
     ob_start();
 ?>
-    <div class="qc-slider" id="<?= $uid ?>" data-vi_tri="<?= htmlspecialchars($vi_tri) ?>">
+    <div class="qc-slider" id="<?= $uid ?>">
         <div class="qc-track">
             <?php foreach ($banners as $i => $b):
-                $src = $b['id'] === 0 ? htmlspecialchars($b['hinh_anh'])
-                    : './assets/file_anh/' . htmlspecialchars($b['hinh_anh']);
-                $alt = htmlspecialchars($b['ten_qc'] ?: 'Banner quảng cáo');
-                $lnk = $b['link'] ? htmlspecialchars($b['link']) : '#!';
+                $alt  = htmlspecialchars($b['ten_qc'] ?: 'Banner quảng cáo');
+                $href = $b['link'] ? htmlspecialchars($b['link']) : '#!';
+                $tgt  = $b['link'] ? ' target="_blank"' : '';
             ?>
                 <div class="qc-slide <?= $i === 0 ? 'active' : '' ?>">
-                    <a href="<?= $lnk ?>" <?= $b['link'] ? 'target="_blank"' : '' ?>>
-                        <img src="<?= $src ?>" alt="<?= $alt ?>" style="width:100%;display:block">
+                    <a href="<?= $href ?>" <?= $tgt ?>>
+                        <img src="<?= $b['src'] ?>" alt="<?= $alt ?>" style="width:100%;display:block">
                     </a>
                 </div>
             <?php endforeach; ?>
         </div>
 
-        <!-- Dots điều hướng -->
-        <?php if (count($banners) > 1): ?>
-            <div class="qc-dots">
-                <?php for ($i = 0; $i < count($banners); $i++): ?>
-                    <button class="qc-dot <?= $i === 0 ? 'active' : '' ?>"
-                        onclick="qcGoTo('<?= $uid ?>', <?= $i ?>)"></button>
-                <?php endfor; ?>
-            </div>
-            <!-- Nút prev/next -->
-            <button class="qc-nav qc-prev" onclick="qcPrev('<?= $uid ?>')">&#8249;</button>
-            <button class="qc-nav qc-next" onclick="qcNext('<?= $uid ?>')">&#8250;</button>
-        <?php endif; ?>
+        <!-- Dots -->
+        <div class="qc-dots">
+            <?php for ($i = 0; $i < count($banners); $i++): ?>
+                <button class="qc-dot <?= $i === 0 ? 'active' : '' ?>"
+                    onclick="qcGoTo('<?= $uid ?>', <?= $i ?>)"></button>
+            <?php endfor; ?>
+        </div>
+
+        <!-- Prev / Next -->
+        <button class="qc-nav qc-prev" onclick="qcPrev('<?= $uid ?>')">&#8249;</button>
+        <button class="qc-nav qc-next" onclick="qcNext('<?= $uid ?>')">&#8250;</button>
     </div>
 <?php
     return ob_get_clean();
