@@ -851,29 +851,104 @@ $voucher_url = trim($_GET['voucher'] ?? '');
                                     mặt khi nhận hàng tại nhà</span></div>
                             <div class="pay-radio-dot"></div>
                         </label>
-                        <label class="pay-option">
-                            <input type="radio" name="phuongthuctt" value="Chuyển khoản" />
+                        <label class="pay-option" id="label-bank">
+                            <input type="radio" name="phuongthuctt" value="Chuyển khoản" id="radio-bank" />
                             <div class="pay-option-icon bank"><span
                                     class="material-symbols-outlined">account_balance</span></div>
-                            <div class="pay-option-label"><strong>Chuyển khoản ngân hàng</strong><span>Chuyển khoản qua
-                                    STK sau khi đặt hàng</span></div>
+                            <div class="pay-option-label">
+                                <strong>Chuyển khoản BIDV</strong>
+                                <span>Quét mã QR — tự động điền số tiền</span>
+                            </div>
                             <div class="pay-radio-dot"></div>
                         </label>
-                        <label class="pay-option">
-                            <input type="radio" name="phuongthuctt" value="MoMo" />
-                            <div class="pay-option-icon momo"><i class="fa-solid fa-wallet"></i></div>
-                            <div class="pay-option-label"><strong>Ví MoMo</strong><span>Thanh toán qua ví điện tử
-                                    MoMo</span></div>
-                            <div class="pay-radio-dot"></div>
-                        </label>
-                        <label class="pay-option">
-                            <input type="radio" name="phuongthuctt" value="VNPay" />
-                            <div class="pay-option-icon vnpay"><span
-                                    class="material-symbols-outlined">credit_card</span></div>
-                            <div class="pay-option-label"><strong>VNPay</strong><span>Thanh toán qua cổng VNPay (ATM /
-                                    QR)</span></div>
-                            <div class="pay-radio-dot"></div>
-                        </label>
+
+                        <!-- ── QR BIDV PANEL (hiện khi chọn chuyển khoản) ── -->
+                        <div id="qr-bidv-panel"
+                            style="display:none;margin-top:4px;padding:20px;background:#f9f9f9;border:1.5px solid #e0e0e0;border-radius:10px;">
+                            <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;">
+
+                                <!-- QR Image -->
+                                <div style="text-align:center;flex-shrink:0;">
+                                    <div
+                                        style="background:#fff;border:2px solid #e8e8e8;border-radius:10px;padding:10px;display:inline-block;box-shadow:0 2px 8px rgba(0,0,0,.08);">
+                                        <img id="qr-img" src="" alt="QR BIDV"
+                                            style="width:180px;height:180px;display:block;border-radius:4px;" />
+                                    </div>
+                                    <div style="margin-top:8px;font-size:12px;color:#888;">Quét bằng App ngân hàng bất
+                                        kỳ</div>
+                                </div>
+
+                                <!-- Thông tin TK -->
+                                <div style="flex:1;min-width:200px;">
+                                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+                                        <!-- Logo BIDV text -->
+                                        <div
+                                            style="background:#1a3c8f;color:#fff;font-weight:900;font-size:16px;letter-spacing:1px;padding:5px 12px;border-radius:6px;">
+                                            BIDV</div>
+                                        <span style="font-size:13px;color:#555;">Ngân hàng TMCP Đầu tư và Phát triển
+                                            VN</span>
+                                    </div>
+
+                                    <?php
+                        // ══════════════════════════════════════════════════
+                        //  ĐỔI THÔNG TIN TÀI KHOẢN BIDV CỦA BẠN Ở ĐÂY
+                        // ══════════════════════════════════════════════════
+                        $BIDV_STK       = '7211549501';          // ← Số tài khoản BIDV
+                        $BIDV_TEN_TK    = 'NGUYEN VAN TRUC';         // ← Tên chủ tài khoản (KHÔNG DẤU)
+                        $BIDV_NOI_DUNG  = 'Thanh toan don hang';  // ← Nội dung CK mặc định
+                        $BIDV_BANK_CODE = 'BIDV';                 // Giữ nguyên
+                        ?>
+
+                                    <table style="width:100%;font-size:14px;border-collapse:collapse;">
+                                        <tr style="border-bottom:1px solid #f0f0f0">
+                                            <td style="padding:7px 0;color:#888;width:130px;">Ngân hàng</td>
+                                            <td style="padding:7px 0;font-weight:600;color:#1a3c8f;">BIDV</td>
+                                        </tr>
+                                        <tr style="border-bottom:1px solid #f0f0f0">
+                                            <td style="padding:7px 0;color:#888;">Số tài khoản</td>
+                                            <td style="padding:7px 0;">
+                                                <strong
+                                                    style="font-size:16px;letter-spacing:.5px"><?= $BIDV_STK ?></strong>
+                                                <button type="button" onclick="copyText('<?= $BIDV_STK ?>', this)"
+                                                    style="margin-left:8px;background:#f0f4ff;border:1px solid #c7d2fe;color:#4f46e5;border-radius:5px;padding:3px 10px;font-size:12px;cursor:pointer;transition:all .2s">
+                                                    Sao chép
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr style="border-bottom:1px solid #f0f0f0">
+                                            <td style="padding:7px 0;color:#888;">Chủ tài khoản</td>
+                                            <td style="padding:7px 0;font-weight:600"><?= $BIDV_TEN_TK ?></td>
+                                        </tr>
+                                        <tr style="border-bottom:1px solid #f0f0f0">
+                                            <td style="padding:7px 0;color:#888;">Số tiền</td>
+                                            <td style="padding:7px 0;font-weight:700;color:#ee4d2d;font-size:16px"
+                                                id="qr-amount-display">—</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding:7px 0;color:#888;">Nội dung CK</td>
+                                            <td style="padding:7px 0;">
+                                                <span id="qr-note-display"
+                                                    style="font-weight:600;color:#333"><?= $BIDV_NOI_DUNG ?></span>
+                                                <button type="button"
+                                                    onclick="copyText(document.getElementById('qr-note-display').textContent, this)"
+                                                    style="margin-left:8px;background:#f0f4ff;border:1px solid #c7d2fe;color:#4f46e5;border-radius:5px;padding:3px 10px;font-size:12px;cursor:pointer">
+                                                    Sao chép
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                    <div
+                                        style="margin-top:14px;background:#fffbe6;border:1px solid #ffe58f;border-radius:8px;padding:10px 14px;font-size:13px;color:#856404;line-height:1.5;">
+                                        <span class="material-symbols-outlined"
+                                            style="font-size:16px;vertical-align:middle">info</span>
+                                        Vui lòng chuyển khoản <strong>đúng số tiền và nội dung</strong> để đơn hàng được
+                                        xác nhận nhanh nhất. Đơn sẽ được xử lý sau khi chúng tôi nhận được thanh toán.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -904,11 +979,14 @@ $voucher_url = trim($_GET['voucher'] ?? '');
                         <span id="sum-total"><?=number_format($total_hang)?>đ</span>
                     </div>
 
-                    <button type="submit" name="btn_order" class="btn-order">
+                    <!-- Nút submit — JS chặn nếu đang chọn BIDV -->
+                    <button type="button" id="btn-order-main" class="btn-order" onclick="handleOrderClick()">
                         <span class="material-symbols-outlined"
                             style="vertical-align:middle;font-size:20px">check_circle</span>
                         Xác nhận đặt hàng
                     </button>
+                    <!-- Nút submit thật (ẩn) — trigger khi đã xác nhận CK -->
+                    <button type="submit" name="btn_order" id="btn-order-real" style="display:none"></button>
                     <a href="package.php" class="btn-back">← Quay lại giỏ hàng</a>
                 </div>
             </div>
@@ -1046,14 +1124,288 @@ $voucher_url = trim($_GET['voucher'] ?? '');
         return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
-    // Highlight phương thức thanh toán
+    // Highlight pay-option khi click (cho COD, MoMo, VNPay)
     document.querySelectorAll('.pay-option').forEach(label => {
         label.addEventListener('click', function() {
             document.querySelectorAll('.pay-option').forEach(l => l.classList.remove('selected'));
             this.classList.add('selected');
-            this.querySelector('input[type=radio]').checked = true;
+            const radio = this.querySelector('input[type=radio]');
+            if (radio) radio.checked = true;
         });
     });
+
+    // Hàm sao chép văn bản
+    function copyText(text, btn) {
+        navigator.clipboard.writeText(text).then(() => {
+            const orig = btn.textContent;
+            btn.textContent = '✓ Đã chép';
+            btn.style.background = '#dcfce7';
+            btn.style.borderColor = '#86efac';
+            btn.style.color = '#16a34a';
+            setTimeout(() => {
+                btn.textContent = orig;
+                btn.style.background = '';
+                btn.style.borderColor = '';
+                btn.style.color = '';
+            }, 2000);
+        }).catch(() => {
+            const el = document.createElement('textarea');
+            el.value = text;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            btn.textContent = '✓ Đã chép';
+            setTimeout(() => btn.textContent = 'Sao chép', 2000);
+        });
+    }
+    </script>
+
+    <!-- ══════════════════════════════════════════════════════
+     MODAL QR BIDV
+══════════════════════════════════════════════════════ -->
+    <div id="qr-modal-overlay"
+        style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:99999;align-items:center;justify-content:center;">
+        <div id="qr-modal-box"
+            style="background:#fff;border-radius:16px;padding:32px 28px;max-width:520px;width:90%;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.25);animation:modalPop .25s ease;">
+            <style>
+            @keyframes modalPop {
+                from {
+                    opacity: 0;
+                    transform: scale(.92)
+                }
+
+                to {
+                    opacity: 1;
+                    transform: scale(1)
+                }
+            }
+
+            #qr-modal-box .step-badge {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 24px;
+                height: 24px;
+                border-radius: 50%;
+                background: #1a3c8f;
+                color: #fff;
+                font-size: 12px;
+                font-weight: 700;
+                flex-shrink: 0
+            }
+
+            #qr-modal-box .step-row {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-size: 14px;
+                color: #444;
+                margin-bottom: 10px
+            }
+
+            #qr-confirm-btn {
+                width: 100%;
+                padding: 14px;
+                margin-top: 20px;
+                background: linear-gradient(135deg, #1a3c8f, #2563eb);
+                color: #fff;
+                border: none;
+                border-radius: 8px;
+                font-size: 16px;
+                font-weight: 700;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                transition: opacity .2s
+            }
+
+            #qr-confirm-btn:hover {
+                opacity: .9
+            }
+
+            #qr-cancel-btn {
+                width: 100%;
+                padding: 10px;
+                margin-top: 10px;
+                background: #fff;
+                color: #888;
+                border: 1px solid #e0e0e0;
+                border-radius: 8px;
+                font-size: 14px;
+                cursor: pointer
+            }
+
+            #qr-cancel-btn:hover {
+                background: #f5f5f5
+            }
+
+            #qr-modal-close {
+                position: absolute;
+                top: 14px;
+                right: 18px;
+                font-size: 24px;
+                cursor: pointer;
+                color: #aaa;
+                line-height: 1;
+                transition: color .15s;
+                background: none;
+                border: none
+            }
+
+            #qr-modal-close:hover {
+                color: #333
+            }
+            </style>
+            <button id="qr-modal-close" type="button" onclick="closeQrModal()">&#x2715;</button>
+            <div style="text-align:center;margin-bottom:20px;">
+                <div
+                    style="background:#1a3c8f;color:#fff;font-weight:900;font-size:20px;letter-spacing:2px;padding:6px 18px;border-radius:8px;display:inline-block;margin-bottom:8px;">
+                    BIDV</div>
+                <h3 style="font-size:18px;color:#1a1a1a;margin:0">Quét mã để thanh toán</h3>
+                <p style="font-size:13px;color:#888;margin-top:4px">Dùng app ngân hàng bất kỳ để quét</p>
+            </div>
+            <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;">
+                <div style="text-align:center;flex-shrink:0;">
+                    <div
+                        style="background:#fff;border:2px solid #e0e8ff;border-radius:10px;padding:10px;display:inline-block;box-shadow:0 2px 10px rgba(0,0,0,.08);">
+                        <img id="modal-qr-img" src="" alt="QR BIDV"
+                            style="width:170px;height:170px;display:block;border-radius:4px;" />
+                    </div>
+                    <div style="margin-top:6px;font-size:12px;color:#aaa;">Mã hết hạn sau <span
+                            id="qr-countdown-num">300</span>s</div>
+                </div>
+                <div style="flex:1;min-width:180px;font-size:13px;">
+                    <div
+                        style="background:#f8faff;border:1px solid #dbe4ff;border-radius:8px;padding:12px;margin-bottom:12px;">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span
+                                style="color:#888">Số TK</span><strong id="modal-stk"
+                                style="color:#1a3c8f;font-size:15px;letter-spacing:.5px"></strong></div>
+                        <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span
+                                style="color:#888">Chủ TK</span><strong id="modal-tentk"></strong></div>
+                        <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span
+                                style="color:#888">Số tiền</span><strong id="modal-amount"
+                                style="color:#ee4d2d;font-size:16px"></strong></div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <span style="color:#888">Nội dung</span>
+                            <span style="display:flex;align-items:center;gap:6px">
+                                <strong id="modal-note" style="color:#333"></strong>
+                                <button type="button"
+                                    onclick="copyText(document.getElementById('modal-note').textContent,this)"
+                                    style="background:#eef2ff;border:1px solid #c7d2fe;color:#4f46e5;border-radius:4px;padding:2px 8px;font-size:11px;cursor:pointer">Chép</button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="step-row"><span class="step-badge">1</span> Mở app ngân hàng &rarr; Quét QR</div>
+                    <div class="step-row"><span class="step-badge">2</span> Kiểm tra thông tin, xác nhận chuyển</div>
+                    <div class="step-row"><span class="step-badge">3</span> Ấn nút xác nhận bên dưới</div>
+                </div>
+            </div>
+            <div
+                style="margin-top:14px;background:#fffbe6;border:1px solid #ffe58f;border-radius:8px;padding:10px 14px;font-size:12px;color:#856404;">
+                &#9888;&#65039; Vui lòng chuyển khoản <strong>đúng số tiền và nội dung</strong>. Đơn hàng sẽ được xác
+                nhận sau khi nhận được thanh toán.
+            </div>
+            <button id="qr-confirm-btn" type="button" onclick="confirmTransferred()">
+                <span class="material-symbols-outlined" style="font-size:20px">check_circle</span>
+                Tôi đã chuyển khoản xong
+            </button>
+            <button id="qr-cancel-btn" type="button" onclick="closeQrModal()">&larr; Quay lại chọn phương thức
+                khác</button>
+        </div>
+    </div>
+
+    <script>
+    // ══ BIDV QR MODAL ══════════════════════════════════════════════
+    const BIDV_STK_M = '<?= $BIDV_STK ?>';
+    const BIDV_TENTK_M = '<?= $BIDV_TEN_TK ?>';
+    const BIDV_NOTE_M = '<?= $BIDV_NOI_DUNG ?>';
+    const BIDV_BANK_M = 'BIDV';
+
+    let qrCountdownTimer = null;
+
+    function handleOrderClick() {
+        const radio = document.getElementById('radio-bank');
+        if (radio && radio.checked) {
+            // Chặn submit → mở modal QR
+            openQrModal();
+        } else {
+            // Phương thức khác → submit thẳng
+            document.getElementById('btn-order-real').click();
+        }
+    }
+
+    function openQrModal() {
+        const totalText = document.getElementById('sum-total').textContent.replace(/[^\d]/g, '');
+        const amount = parseInt(totalText) || TOTAL_HANG;
+
+        // Điền thông tin vào modal
+        document.getElementById('modal-stk').textContent = BIDV_STK_M;
+        document.getElementById('modal-tentk').textContent = BIDV_TENTK_M;
+        document.getElementById('modal-amount').textContent = Number(amount).toLocaleString('vi-VN') + 'đ';
+        document.getElementById('modal-note').textContent = BIDV_NOTE_M;
+
+        // Tạo QR
+        const qrUrl = 'https://img.vietqr.io/image/' +
+            BIDV_BANK_M + '-' + BIDV_STK_M + '-compact2.png' +
+            '?amount=' + amount +
+            '&addInfo=' + encodeURIComponent(BIDV_NOTE_M) +
+            '&accountName=' + encodeURIComponent(BIDV_TENTK_M);
+        document.getElementById('modal-qr-img').src = qrUrl;
+
+        // Hiện modal
+        const overlay = document.getElementById('qr-modal-overlay');
+        overlay.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+
+        // Đếm ngược 5 phút
+        startCountdown(300);
+    }
+
+    function closeQrModal() {
+        document.getElementById('qr-modal-overlay').style.display = 'none';
+        document.body.style.overflow = '';
+        clearInterval(qrCountdownTimer);
+    }
+
+    function confirmTransferred() {
+        // Đổi nút thành loading
+        const btn = document.getElementById('qr-confirm-btn');
+        btn.innerHTML =
+            '<span class="material-symbols-outlined" style="font-size:18px;animation:spin 1s linear infinite">sync</span> Đang xử lý...';
+        btn.disabled = true;
+
+        // Submit form thật
+        document.getElementById('btn-order-real').click();
+    }
+
+    function startCountdown(seconds) {
+        clearInterval(qrCountdownTimer);
+        let s = seconds;
+        const el = document.getElementById('qr-countdown-num');
+        qrCountdownTimer = setInterval(() => {
+            s--;
+            if (el) el.textContent = s;
+            if (s <= 0) {
+                clearInterval(qrCountdownTimer);
+                // QR hết hạn — làm mới
+                if (el) el.textContent = 'Hết hạn - đang làm mới...';
+                openQrModal();
+            }
+        }, 1000);
+    }
+
+    // Click ngoài modal để đóng
+    document.getElementById('qr-modal-overlay').addEventListener('click', function(e) {
+        if (e.target === this) closeQrModal();
+    });
+
+    // CSS spin cho icon loading
+    const styleEl = document.createElement('style');
+    styleEl.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+    document.head.appendChild(styleEl);
     </script>
 </body>
 

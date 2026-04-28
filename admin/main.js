@@ -28,6 +28,16 @@ function showPage(name, el) {
   if (titleEl) titleEl.textContent = PAGE_TITLES[name] || "Dashboard";
 }
 
+function getNavButton(name) {
+  return document.querySelector(`.nav-item[onclick*="'${name}'"]`);
+}
+
+function syncPageParam(name) {
+  const url = new URL(window.location.href);
+  url.searchParams.set("page", name);
+  window.history.replaceState({}, "", url.toString());
+}
+
 function filterChip(el) {
   el.closest(".filter-row")
     .querySelectorAll(".filter-chip")
@@ -572,7 +582,7 @@ window.openSpView = async function (masp) {
         Xóa
       </button>
       <button class="btn"
-              onclick="closeSpView(true); openNhapKhoModal(${sp.MaSP}, '${escH(sp.TenSP).replace(/'/g, "\\'")}', ${ton}, '${escH(sp.Hinh || "")}', '${sku}')">
+              onclick="closeSpView(true); openNhapKhoFromProducts(${sp.MaSP}, '${escH(sp.TenSP).replace(/'/g, "\\'")}', ${ton}, '${escH(sp.Hinh || "")}', '${sku}')">
         <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 2v12M2 9l6 6 6-6"/></svg>
         Nhập kho
       </button>
@@ -793,14 +803,17 @@ window.openNhapKhoModal = function (masp, tensp, hientai, hinh, sku) {
 
   document.getElementById("nhapkho-masp").value = masp;
   document.getElementById("nhapkho-tensp").textContent = tensp;
-  document.getElementById("nhapkho-sp-sku").textContent =
-    sku || "SP-" + String(masp).padStart(3, "0");
+  const skuEl = document.getElementById("nhapkho-sp-sku");
+  if (skuEl) skuEl.textContent = sku || "SP-" + String(masp).padStart(3, "0");
   document.getElementById("nhapkho-hientai").textContent =
     hientai <= 0 ? "0" : hientai;
   document.getElementById("nhapkho-soluong").value = 10;
-  document.getElementById("nhapkho-gianhap").value = "";
-  document.getElementById("nhapkho-ncc").value = "";
-  document.getElementById("nhapkho-ghichu").value = "";
+  const giaNhapEl = document.getElementById("nhapkho-gianhap");
+  const nccEl = document.getElementById("nhapkho-ncc");
+  const ghiChuEl = document.getElementById("nhapkho-ghichu");
+  if (giaNhapEl) giaNhapEl.value = "";
+  if (nccEl) nccEl.value = "";
+  if (ghiChuEl) ghiChuEl.value = "";
 
   // Ảnh thumb
   const thumb = document.getElementById("nhapkho-sp-thumb");
@@ -823,6 +836,12 @@ window.openNhapKhoModal = function (masp, tensp, hientai, hinh, sku) {
   el.classList.add("open");
   document.body.style.overflow = "hidden";
   setTimeout(() => document.getElementById("nhapkho-soluong")?.focus(), 120);
+};
+
+window.openNhapKhoFromProducts = function (masp, tensp, hientai, hinh, sku) {
+  syncPageParam("inventory");
+  showPage("inventory", getNavButton("inventory"));
+  openNhapKhoModal(masp, tensp, hientai, hinh, sku);
 };
 
 window.nhapKhoPreview = function () {
@@ -1060,7 +1079,7 @@ window.openKhView = async function (makh) {
             <div class="kh-kpi-label">Đơn hàng</div>
           </div>
           <div class="kh-kpi">
-            <div class="kh-kpi-val" style="color:var(--accent-mid)">${fmtVND(stat.tong_tien)}</div>
+            <div class="kh-kpi-val" style="color:var(--accent-hover)">${fmtVND(stat.tong_tien)}</div>
             <div class="kh-kpi-label">Chi tiêu</div>
           </div>
           <div class="kh-kpi">
@@ -1599,7 +1618,10 @@ window.submitBulkNhapKho = async function () {
         const fd = new FormData();
         fd.append("masp", item.masp);
         fd.append("soluong", item.soluong);
-        const res = await fetch("stockin_create.php", { method: "POST", body: fd });
+        const res = await fetch("stockin_create.php", {
+          method: "POST",
+          body: fd,
+        });
         return res.json();
       }),
     );
@@ -2129,6 +2151,344 @@ window.submitPromoForm = async function (type) {
 document.addEventListener("keydown", (e) => {
   if (e.key !== "Escape") return;
   ["promo-view-overlay", "promo-form-overlay"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el?.classList.contains("open")) {
+      el.classList.remove("open");
+      document.body.style.overflow = "";
+    }
+  });
+});
+
+/* ═══════════════════════════════════════════
+   QUẢN LÝ QUẢNG CÁO
+═══════════════════════════════════════════ */
+const ADS_VITRI = {
+  banner_top: "🔝 Banner Top",
+  banner_home: "🏠 Banner Home",
+  popup: "💬 Popup",
+  sidebar: "📌 Sidebar",
+};
+
+/* ── View Modal ── */
+window.openAdsView = async function (id) {
+  const overlay = document.getElementById("ads-view-overlay");
+  const body = document.getElementById("ads-view-body");
+  const footer = document.getElementById("ads-view-footer");
+  const title = document.getElementById("ads-view-title");
+  const sub = document.getElementById("ads-view-sub");
+
+  body.innerHTML =
+    '<div class="modal-loading"><div class="modal-spinner"></div> Đang tải...</div>';
+  footer.innerHTML = "";
+  overlay.classList.add("open");
+  document.body.style.overflow = "hidden";
+
+  try {
+    const res = await fetch(`../includes/ads_get.php?id=${id}`);
+    const data = await res.json();
+    if (!data.ok) {
+      body.innerHTML = `<div class="modal-error">${escH(data.error)}</div>`;
+      return;
+    }
+
+    const d = data.data;
+    const today = new Date().toISOString().slice(0, 10);
+    const isOn = d.trang_thai == 1;
+    const status =
+      !d.ngay_bat_dau && !d.ngay_ket_thuc
+        ? "active"
+        : d.ngay_bat_dau > today
+          ? "upcoming"
+          : d.ngay_ket_thuc < today
+            ? "expired"
+            : "active";
+    const [sb, sl] = !isOn
+      ? ["badge-gray", "Tạm dừng"]
+      : status === "upcoming"
+        ? ["badge-blue", "Sắp chạy"]
+        : status === "expired"
+          ? ["badge-red", "Hết hạn"]
+          : ["badge-green", "Đang chạy"];
+
+    title.textContent = escH(d.ten_qc);
+    sub.textContent = `#QC-${String(d.id).padStart(4, "0")}`;
+
+    body.innerHTML = `
+      ${
+        d.hinh_anh
+          ? `
+      <div style="border-radius:10px;overflow:hidden;border:1px solid var(--border);margin-bottom:16px;max-height:200px;display:flex;align-items:center;justify-content:center;background:var(--bg-page)">
+        <img src="../assets/file_anh/${escH(d.hinh_anh)}" style="width:100%;object-fit:cover;max-height:200px">
+      </div>`
+          : ""
+      }
+
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <span class="badge ${sb}">${sl}</span>
+        <span class="badge badge-blue" style="font-size:11px">${ADS_VITRI[d.vi_tri] || d.vi_tri}</span>
+        ${d.thu_tu > 0 ? `<span style="font-size:12px;color:var(--text-muted)">Thứ tự: ${d.thu_tu}</span>` : ""}
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-title">Thông tin chi tiết</div>
+        <div class="modal-info-grid">
+          ${
+            d.link
+              ? `
+          <div class="modal-info-item" style="grid-column:1/-1">
+            <span class="modal-info-label">Đường dẫn (Link)</span>
+            <a href="${escH(d.link)}" target="_blank" style="color:var(--accent-mid);font-size:13px;word-break:break-all">${escH(d.link)}</a>
+          </div>`
+              : ""
+          }
+          <div class="modal-info-item">
+            <span class="modal-info-label">Ngày bắt đầu</span>
+            <span class="modal-info-val">${d.ngay_bat_dau ? d.ngay_bat_dau.split("-").reverse().join("/") : "Không giới hạn"}</span>
+          </div>
+          <div class="modal-info-item">
+            <span class="modal-info-label">Ngày kết thúc</span>
+            <span class="modal-info-val">${d.ngay_ket_thuc ? d.ngay_ket_thuc.split("-").reverse().join("/") : "Không giới hạn"}</span>
+          </div>
+          ${
+            d.mo_ta
+              ? `
+          <div class="modal-info-item" style="grid-column:1/-1">
+            <span class="modal-info-label">Mô tả</span>
+            <span class="modal-info-val" style="white-space:pre-line">${escH(d.mo_ta)}</span>
+          </div>`
+              : ""
+          }
+          <div class="modal-info-item">
+            <span class="modal-info-label">Ngày tạo</span>
+            <span class="modal-info-val">${d.created_at?.slice(0, 10).split("-").reverse().join("/") || "—"}</span>
+          </div>
+        </div>
+      </div>`;
+
+    footer.innerHTML = `
+      <button class="btn" onclick="closeAdsView(true)">Đóng</button>
+      <button class="btn" style="background:#fee2e2;color:#991b1b;border:1px solid #fca5a5"
+              onclick="confirmDeleteAds(${d.id},'${escH(d.ten_qc).replace(/'/g, "\\'")}')">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 4.5 14.5 11.5 14.5 13 6"/><path d="M1 4h14M6 4V2h4v2"/></svg>
+        Xóa
+      </button>
+      <button class="btn btn-primary" onclick="closeAdsView(true); openAdsForm(${d.id})">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 2l3 3-9 9H2v-3L11 2z"/></svg>
+        Sửa thông tin
+      </button>`;
+  } catch (e) {
+    body.innerHTML = `<div class="modal-error">Lỗi tải dữ liệu<br><small>${e.message}</small></div>`;
+  }
+};
+
+window.closeAdsView = function (force) {
+  if (
+    force === true ||
+    force?.target === document.getElementById("ads-view-overlay")
+  ) {
+    document.getElementById("ads-view-overlay").classList.remove("open");
+    document.body.style.overflow = "";
+  }
+};
+
+window.confirmDeleteAds = async function (id, name) {
+  closeAdsView(true);
+  if (!confirm(`Xóa quảng cáo "${name}"?\nKhông thể hoàn tác.`)) return;
+  try {
+    const res = await fetch(`../includes/ads_delete.php?id=${id}`);
+    const data = await res.json();
+    if (data.ok) {
+      showToast("Đã xóa quảng cáo", "success");
+      setTimeout(() => window.location.reload(), 800);
+    } else showToast("Lỗi: " + (data.error || ""), "error");
+  } catch (e) {
+    showToast("Lỗi kết nối", "error");
+  }
+};
+
+/* ── Form Thêm / Sửa ── */
+window.openAdsForm = async function (id) {
+  const overlay = document.getElementById("ads-form-overlay");
+  const body = document.getElementById("ads-form-body");
+  const footer = document.getElementById("ads-form-footer");
+  const title = document.getElementById("ads-form-title");
+  const sub = document.getElementById("ads-form-sub");
+
+  overlay.classList.add("open");
+  document.body.style.overflow = "hidden";
+  body.innerHTML =
+    '<div class="modal-loading"><div class="modal-spinner"></div> Đang tải...</div>';
+  footer.innerHTML = "";
+
+  let d = null;
+  if (id > 0) {
+    try {
+      const res = await fetch(`../includes/ads_get.php?id=${id}`);
+      const dt = await res.json();
+      if (dt.ok) d = dt.data;
+    } catch (e) {}
+  }
+
+  title.textContent = d ? "Sửa quảng cáo" : "Thêm quảng cáo mới";
+  sub.textContent = d ? `#QC-${String(d.id).padStart(4, "0")}` : "";
+
+  const vtOpts = Object.entries(ADS_VITRI)
+    .map(
+      ([k, v]) =>
+        `<option value="${k}" ${d?.vi_tri === k ? "selected" : ""}>${v}</option>`,
+    )
+    .join("");
+
+  body.innerHTML = `
+    <input type="hidden" id="af-id" value="${d?.id || 0}">
+    <input type="hidden" id="af-hinh-cu" value="${escH(d?.hinh_anh || "")}">
+    <div class="form-row-2">
+
+      <div class="form-group" style="grid-column:1/-1">
+        <label class="form-label">Tên quảng cáo <span style="color:var(--danger)">*</span></label>
+        <input class="form-input" id="af-ten" value="${escH(d?.ten_qc || "")}" placeholder="VD: Banner khuyến mãi mùa hè">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Vị trí hiển thị</label>
+        <select class="form-input" id="af-vitri">${vtOpts}</select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Thứ tự (ưu tiên nhỏ hơn = cao hơn)</label>
+        <input class="form-input" id="af-thutu" type="number" min="0" value="${d?.thu_tu || 0}">
+      </div>
+
+      <div class="form-group" style="grid-column:1/-1">
+        <label class="form-label">Đường dẫn khi click (Link)</label>
+        <input class="form-input" id="af-link" type="url" value="${escH(d?.link || "")}" placeholder="https://...">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Ngày bắt đầu</label>
+        <input class="form-input" id="af-start" type="date" value="${d?.ngay_bat_dau || ""}">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Ngày kết thúc</label>
+        <input class="form-input" id="af-end" type="date" value="${d?.ngay_ket_thuc || ""}">
+      </div>
+
+      <div class="form-group" style="grid-column:1/-1">
+        <label class="form-label">Mô tả</label>
+        <textarea class="form-input" id="af-mota" rows="3" placeholder="Mô tả nội dung quảng cáo...">${escH(d?.mo_ta || "")}</textarea>
+      </div>
+
+      <div class="form-group" style="grid-column:1/-1">
+        <label class="form-label">Ảnh quảng cáo</label>
+        ${
+          d?.hinh_anh
+            ? `
+        <div style="margin-bottom:10px;border-radius:8px;overflow:hidden;border:1px solid var(--border);max-height:140px">
+          <img src="../assets/file_anh/${escH(d.hinh_anh)}" style="width:100%;object-fit:cover;max-height:140px">
+        </div>
+        <div style="font-size:11.5px;color:var(--text-muted);margin-bottom:6px">Tải lên ảnh mới để thay thế</div>`
+            : ""
+        }
+        <input type="file" id="af-hinh" accept="image/*" class="form-input" style="padding:6px">
+      </div>
+
+      <div class="form-group" style="grid-column:1/-1">
+        <label class="form-label">Trạng thái</label>
+        <label style="display:flex;align-items:center;gap:10px;margin-top:6px;cursor:pointer">
+          <div class="toggle-wrap">
+            <input type="checkbox" id="af-tt" ${(d?.trang_thai ?? 1) == 1 ? "checked" : ""}
+                   style="width:16px;height:16px;cursor:pointer">
+          </div>
+          <span style="font-size:13px" id="af-tt-label">${(d?.trang_thai ?? 1) == 1 ? "Đang hiển thị" : "Tạm dừng"}</span>
+        </label>
+      </div>
+    </div>`;
+
+  // Toggle label
+  document.getElementById("af-tt").addEventListener("change", function () {
+    document.getElementById("af-tt-label").textContent = this.checked
+      ? "Đang hiển thị"
+      : "Tạm dừng";
+  });
+
+  footer.innerHTML = `
+    <button class="btn" onclick="closeAdsForm(true)">Hủy</button>
+    <button class="btn btn-primary" id="af-save-btn" onclick="submitAdsForm()">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 8l4 4 8-8"/></svg>
+      ${d ? "Lưu thay đổi" : "Thêm quảng cáo"}
+    </button>`;
+};
+
+window.closeAdsForm = function (force) {
+  if (
+    force === true ||
+    force?.target === document.getElementById("ads-form-overlay")
+  ) {
+    document.getElementById("ads-form-overlay").classList.remove("open");
+    document.body.style.overflow = "";
+  }
+};
+
+window.submitAdsForm = async function () {
+  const ten = document.getElementById("af-ten").value.trim();
+  if (!ten) {
+    showToast("Vui lòng nhập tên quảng cáo", "error");
+    return;
+  }
+
+  const fd = new FormData();
+  fd.append("id", document.getElementById("af-id").value);
+  fd.append("ten_qc", ten);
+  fd.append("vi_tri", document.getElementById("af-vitri").value);
+  fd.append("thu_tu", document.getElementById("af-thutu").value || 0);
+  fd.append("link", document.getElementById("af-link").value.trim());
+  fd.append("mo_ta", document.getElementById("af-mota").value.trim());
+  fd.append("hinh_cu", document.getElementById("af-hinh-cu").value);
+  fd.append("ngay_bat_dau", document.getElementById("af-start").value);
+  fd.append("ngay_ket_thuc", document.getElementById("af-end").value);
+  if (document.getElementById("af-tt").checked) fd.append("trang_thai", "1");
+
+  const hinhFile = document.getElementById("af-hinh").files[0];
+  if (hinhFile) fd.append("hinh_anh", hinhFile);
+
+  const btn = document.getElementById("af-save-btn");
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = "Đang lưu...";
+  }
+
+  try {
+    const res = await fetch("../includes/ads_save.php", {
+      method: "POST",
+      body: fd,
+    });
+    const data = await res.json();
+    if (data.ok) {
+      closeAdsForm(true);
+      showToast(data.msg || "Đã lưu thành công!", "success");
+      setTimeout(() => window.location.reload(), 900);
+    } else {
+      showToast("Lỗi: " + (data.error || ""), "error");
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = "Lưu";
+      }
+    }
+  } catch (e) {
+    showToast("Lỗi kết nối: " + e.message, "error");
+    if (btn) btn.disabled = false;
+  }
+};
+
+// PAGE_TITLES update
+if (typeof PAGE_TITLES !== "undefined")
+  PAGE_TITLES["ads"] = "Quản lý Quảng cáo";
+
+// ESC
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  ["ads-view-overlay", "ads-form-overlay"].forEach((id) => {
     const el = document.getElementById(id);
     if (el?.classList.contains("open")) {
       el.classList.remove("open");

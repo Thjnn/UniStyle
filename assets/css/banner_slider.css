@@ -1,0 +1,92 @@
+/* ═══════════════════════════════════════
+   BANNER SLIDER — dùng chung toàn site
+═══════════════════════════════════════ */
+.qc-slider {
+  position: relative;
+  overflow: hidden;
+  line-height: 0; /* xóa khoảng trắng ảnh */
+  border-radius: inherit; /* kế thừa border-radius của section cha */
+}
+
+.qc-track {
+  display: flex;
+  width: 100%;
+}
+
+.qc-slide {
+  min-width: 100%;
+  display: none;
+  animation: qcFadeIn 0.45s ease;
+}
+.qc-slide.active {
+  display: block;
+}
+
+@keyframes qcFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Dots */
+.qc-dots {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 7px;
+  z-index: 10;
+}
+.qc-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s;
+}
+.qc-dot.active {
+  background: #fff;
+  width: 22px;
+  border-radius: 4px;
+}
+
+/* Prev / Next */
+.qc-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  border: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+  opacity: 0; /* ẩn mặc định */
+}
+.qc-slider:hover .qc-nav {
+  opacity: 1;
+}
+.qc-nav:hover {
+  background: rgba(0, 0, 0, 0.6);
+}
+.qc-prev {
+  left: 12px;
+}
+.qc-next {
+  right: 12px;
+}

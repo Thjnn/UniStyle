@@ -108,7 +108,7 @@ $orders_today = $row_today['total_today'];
             <path d="M8 1v13M2 4.5l6 3.5 6-3.5" />
           </svg>
           Sản phẩm
-          <span class="nav-badge badge-blue-soft">148</span>
+
         </button>
 
         <button class="nav-item" onclick="showPage('customers', this)">
@@ -126,7 +126,7 @@ $orders_today = $row_today['total_today'];
             <path d="M5.5 6V4.5a2.5 2.5 0 015 0V6" />
           </svg>
           Kho hàng
-          <span class="nav-badge badge-red-soft">5</span>
+
         </button>
 
         <button class="nav-item" onclick="showPage('promotions', this)">
@@ -135,6 +135,15 @@ $orders_today = $row_today['total_today'];
             <path d="M8 5v3l2 1.5" />
           </svg>
           Khuyến mãi
+        </button>
+
+        <button class="nav-item" onclick="showPage('ads', this)">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <rect x="1" y="4" width="14" height="8" rx="1.5" />
+            <path d="M4 8h5M4 10.5h3" />
+            <circle cx="12" cy="8" r="1.5" fill="currentColor" stroke="none" />
+          </svg>
+          Quảng cáo
         </button>
       </nav>
 
@@ -530,7 +539,7 @@ $orders_today = $row_today['total_today'];
           <div class="sec-header">
             <div>
               <div class="sec-title">Quản lý sản phẩm</div>
-              <div class="sec-sub">148 sản phẩm đang kinh doanh</div>
+
             </div>
             <!-- Nút xuất danh sách -->
             <div class="sec-actions">
@@ -623,7 +632,7 @@ $orders_today = $row_today['total_today'];
           <div class="sec-header">
             <div>
               <div class="sec-title">Quản lý kho hàng</div>
-              <div class="sec-sub" id="inv-sub">Đang tải...</div>
+
             </div>
             <div class="sec-actions">
               <div class="export-dropdown" id="export-inv-dd">
@@ -690,6 +699,29 @@ $orders_today = $row_today['total_today'];
         </div>
         <!-- /PAGE PROMOTIONS -->
 
+        <!-- ═══════════════════════════════════════
+           PAGE: ADS
+      ═══════════════════════════════════════ -->
+        <div class="page" id="page-ads">
+          <div class="sec-header">
+            <div>
+              <div class="sec-title">Quản lý Quảng cáo</div>
+              <div class="sec-sub">Banner, popup và nội dung quảng bá</div>
+            </div>
+            <div class="sec-actions">
+              <button class="btn btn-primary" onclick="openAdsForm(0)" style="display:flex;align-items:center;gap:6px">
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <path d="M8 2v12M2 8h12" />
+                </svg>
+                Thêm quảng cáo
+              </button>
+            </div>
+          </div>
+
+          <?php require_once __DIR__ . '/../includes/ads_table.php'; ?>
+        </div>
+        <!-- /PAGE ADS -->
+
       </main>
       <!-- /CONTENT -->
     </div>
@@ -753,7 +785,7 @@ $orders_today = $row_today['total_today'];
 
   <!-- ═══════════ MODAL NHẬP KHO ═══════════ -->
   <div class="modal-overlay" id="nhapkho-modal-overlay" onclick="closeNhapKhoModal(event)">
-    <div class="modal-box" style="max-width:400px">
+    <div class="modal-box" style="max-width:520px">
       <div class="modal-header">
         <div>
           <div class="modal-title">Nhập kho</div>
@@ -767,6 +799,13 @@ $orders_today = $row_today['total_today'];
       </div>
       <div class="modal-body">
         <input type="hidden" id="nhapkho-masp">
+        <div style="display:flex;gap:12px;align-items:center;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--bg-page);margin-bottom:16px">
+          <div id="nhapkho-sp-thumb" style="width:56px;height:56px;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;overflow:hidden;flex-shrink:0">📦</div>
+          <div style="flex:1;min-width:0">
+            <div id="nhapkho-sp-sku" style="font-size:12px;color:var(--text-muted);margin-bottom:4px"></div>
+            <div style="font-size:13px;color:var(--text-secondary)">Phiếu nhập cho sản phẩm đang chọn</div>
+          </div>
+        </div>
         <div style="margin-bottom:14px">
           <label class="form-label">Tồn kho hiện tại</label>
           <div id="nhapkho-hientai" style="font-size:20px;font-weight:600;color:var(--accent-mid);margin-top:4px">—</div>
@@ -987,6 +1026,48 @@ $orders_today = $row_today['total_today'];
           Xác nhận nhập kho
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ MODAL XEM QUẢNG CÁO ═══════════ -->
+  <div class="modal-overlay" id="ads-view-overlay" onclick="closeAdsView(event)">
+    <div class="modal-box" style="max-width:600px">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="ads-view-title">Chi tiết quảng cáo</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:3px" id="ads-view-sub"></div>
+        </div>
+        <button class="modal-close" onclick="closeAdsView(true)">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M2 2l12 12M14 2L2 14" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" id="ads-view-body">
+        <div class="modal-loading">
+          <div class="modal-spinner"></div> Đang tải...
+        </div>
+      </div>
+      <div class="modal-footer" id="ads-view-footer"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════ MODAL FORM QUẢNG CÁO ═══════════ -->
+  <div class="modal-overlay" id="ads-form-overlay" onclick="closeAdsForm(event)">
+    <div class="modal-box" style="max-width:580px">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="ads-form-title">Thêm quảng cáo</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:3px" id="ads-form-sub"></div>
+        </div>
+        <button class="modal-close" onclick="closeAdsForm(true)">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M2 2l12 12M14 2L2 14" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" id="ads-form-body"></div>
+      <div class="modal-footer" id="ads-form-footer"></div>
     </div>
   </div>
 </body>

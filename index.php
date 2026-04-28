@@ -763,7 +763,7 @@ if (!empty($_SESSION['cart'])) {
         <button class="see-more-btn">Xem thêm sản phẩm</button>
       </div>
     </section>
-    <!-- News -->
+    <!-- News
     <section class="news-section">
       <div class="news-container">
 
@@ -843,6 +843,13 @@ if (!empty($_SESSION['cart'])) {
 
         </div>
       </div>
+    </section> -->
+    <section class="charity-banner">
+      <a href="#!">
+        <img
+          src="./assets/file_anh/1920_x_600___cta__1_d652d361086646d3b12a89b38ce6c294.jpg"
+          alt="Back To School Sale" />
+      </a>
     </section>
   </div>
 
