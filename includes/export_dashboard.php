@@ -2,26 +2,21 @@
 require_once __DIR__ . '/../config/db.php';
 
 /* =========================
-   KPI DASHBOARD
+   1. TRUY VẤN DỮ LIỆU
 ========================= */
+
+// KPI DASHBOARD
 $sql_kpi = "
 SELECT 
     COALESCE(SUM(tongtien),0) as tong_doanh_thu,
-    (SELECT COUNT(*) 
-     FROM dathang 
-     WHERE DATE(ngaydat) = CURDATE()
-    ) as dh_hom_nay,
+    (SELECT COUNT(*) FROM dathang WHERE DATE(ngaydat) = CURDATE()) as dh_hom_nay,
     (SELECT COUNT(*) FROM khachhang) as tong_kh
 FROM dathang 
 WHERE trangthai IN ('Hoàn thành','Đã giao')
 ";
-
 $kpi = $conn->query($sql_kpi)->fetch_assoc();
 
-
-/* =========================
-   DOANH THU 7 NGÀY
-========================= */
+// DOANH THU 7 NGÀY
 $sql_7days = "
 SELECT 
     d.date as ngay,
@@ -41,13 +36,9 @@ LEFT JOIN dathang t
 GROUP BY d.date
 ORDER BY d.date ASC
 ";
+$revenue_7days = $conn->query($sql_7days)->fetch_all(MYSQLI_ASSOC);
 
-$revenue_7days = $conn->query($sql_7days);
-
-
-/* =========================
-   TOP SẢN PHẨM
-========================= */
+// TOP SẢN PHẨM
 $sql_top = "
 SELECT 
     sp.TenSP, 
@@ -59,65 +50,166 @@ GROUP BY sp.MaSP, sp.TenSP
 ORDER BY da_ban DESC
 LIMIT 10
 ";
-
-$top_products = $conn->query($sql_top);
-
+$top_products = $conn->query($sql_top)->fetch_all(MYSQLI_ASSOC);
 
 /* =========================
-   EXPORT CSV
+   2. CẤU HÌNH HEADER EXCEL
 ========================= */
-header('Content-Type: text/csv; charset=utf-8');
-header('Content-Disposition: attachment; filename=Dashboard_' . date('d-m-Y') . '.csv');
+$filename = 'Bao-cao-Dashboard-' . date('d-m-Y');
+header('Content-Type: application/vnd.ms-excel; charset=utf-8');
+header("Content-Disposition: attachment; filename=\"{$filename}.xls\"");
+header('Cache-Control: no-cache, must-revalidate');
+header('Pragma: no-cache');
+?>
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+    xmlns:x="urn:schemas-microsoft-com:office:excel"
+    xmlns="http://www.w3.org/TR/REC-html40">
 
-$output = fopen('php://output', 'w');
-fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
 
-/* =========================
-   TITLE
-========================= */
-fputcsv($output, ['BÁO CÁO TỔNG QUAN DASHBOARD']);
-fputcsv($output, ['Ngày xuất:', date('d/m/Y H:i')]);
-fputcsv($output, []);
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
 
-/* =========================
-   KPI
-========================= */
-fputcsv($output, ['KPI', 'GIÁ TRỊ']);
-fputcsv($output, ['Doanh thu', number_format($kpi['tong_doanh_thu']) . ' VND']);
-fputcsv($output, ['Đơn hàng hôm nay', $kpi['dh_hom_nay']]);
-fputcsv($output, ['Khách hàng', $kpi['tong_kh']]);
-fputcsv($output, []);
+        th {
+            background-color: #1d4ed8;
+            color: #ffffff;
+            font-weight: bold;
+            text-align: center;
+            padding: 10px;
+            border: 1px solid #1e40af;
+        }
 
+        td {
+            padding: 8px 10px;
+            border: 1px solid #e2e8f0;
+            vertical-align: middle;
+        }
 
-/* =========================
-   7 NGÀY
-========================= */
-fputcsv($output, ['DOANH THU 7 NGÀY GẦN NHẤT']);
-fputcsv($output, ['Ngày', 'Doanh thu']);
+        tr:nth-child(even) td {
+            background-color: #f8fafc;
+        }
 
-while ($row = $revenue_7days->fetch_assoc()) {
-    fputcsv($output, [
-        date('d/m', strtotime($row['ngay'])),
-        number_format($row['doanh_thu']) . ' VND'
-    ]);
-}
+        .header-title {
+            background: #eff6ff;
+            font-weight: 700;
+            font-size: 16pt;
+            color: #1e40af;
+            padding: 15px;
+            text-align: center;
+        }
 
-fputcsv($output, []);
+        .section-title {
+            background: #f1f5f9;
+            font-weight: 700;
+            font-size: 12pt;
+            color: #334155;
+            padding: 8px;
+            border-left: 5px solid #1d4ed8;
+        }
 
+        .kpi-box {
+            text-align: center;
+            font-size: 14pt;
+            font-weight: bold;
+            color: #16a34a;
+        }
 
-/* =========================
-   TOP SẢN PHẨM
-========================= */
-fputcsv($output, ['SẢN PHẨM BÁN CHẠY']);
-fputcsv($output, ['Tên sản phẩm', 'Số lượng', 'Doanh thu']);
+        .ta-right {
+            text-align: right;
+        }
 
-while ($row = $top_products->fetch_assoc()) {
-    fputcsv($output, [
-        $row['TenSP'],
-        $row['da_ban'],
-        number_format($row['doanh_thu']) . ' VND'
-    ]);
-}
+        .ta-center {
+            text-align: center;
+        }
 
-fclose($output);
-exit;
+        .text-muted {
+            color: #64748b;
+            font-size: 10pt;
+        }
+    </style>
+</head>
+
+<body>
+    <table>
+        <tr>
+            <td colspan="4" class="header-title">📊 BÁO CÁO TỔNG QUAN HỆ THỐNG — UniStyle</td>
+        </tr>
+        <tr>
+            <td colspan="4" class="ta-center text-muted">Xuất ngày: <?= date('d/m/Y H:i') ?></td>
+        </tr>
+        <tr>
+            <td colspan="4" style="border:none; height:20px;"></td>
+        </tr>
+
+        <tr>
+            <td colspan="4" class="section-title">1. Chỉ số quan trọng (KPI)</td>
+        </tr>
+        <tr>
+            <th colspan="2">Chỉ tiêu</th>
+            <th colspan="2">Giá trị hiện tại</th>
+        </tr>
+        <tr>
+            <td colspan="2">💰 Tổng doanh thu (Hoàn thành)</td>
+            <td colspan="2" class="kpi-box"><?= number_format($kpi['tong_doanh_thu'], 0, ',', '.') ?>đ</td>
+        </tr>
+        <tr>
+            <td colspan="2">📦 Đơn hàng mới hôm nay</td>
+            <td colspan="2" class="ta-center" style="font-weight:bold;"><?= $kpi['dh_hom_nay'] ?> đơn</td>
+        </tr>
+        <tr>
+            <td colspan="2">👥 Tổng số khách hàng</td>
+            <td colspan="2" class="ta-center"><?= $kpi['tong_kh'] ?> thành viên</td>
+        </tr>
+
+        <tr>
+            <td colspan="4" style="border:none; height:20px;"></td>
+        </tr>
+
+        <tr>
+            <td colspan="4" class="section-title">2. Doanh thu 7 ngày gần nhất</td>
+        </tr>
+        <tr>
+            <th colspan="2">Ngày</th>
+            <th colspan="2">Doanh thu</th>
+        </tr>
+        <?php foreach ($revenue_7days as $r): ?>
+            <tr>
+                <td colspan="2" class="ta-center"><?= date('d/m/Y', strtotime($r['ngay'])) ?></td>
+                <td colspan="2" class="ta-right"><?= number_format($r['doanh_thu'], 0, ',', '.') ?>đ</td>
+            </tr>
+        <?php endforeach; ?>
+
+        <tr>
+            <td colspan="4" style="border:none; height:20px;"></td>
+        </tr>
+
+        <tr>
+            <td colspan="4" class="section-title">3. Top 10 sản phẩm bán chạy nhất</td>
+        </tr>
+        <tr>
+            <th style="width:50px">STT</th>
+            <th>Tên sản phẩm</th>
+            <th>Số lượng bán</th>
+            <th>Doanh thu thu về</th>
+        </tr>
+        <?php
+        $stt = 1;
+        foreach ($top_products as $p): ?>
+            <tr>
+                <td class="ta-center"><?= $stt++ ?></td>
+                <td><?= htmlspecialchars($p['TenSP']) ?></td>
+                <td class="ta-center"><?= number_format($p['da_ban']) ?></td>
+                <td class="ta-right"><?= number_format($p['doanh_thu'], 0, ',', '.') ?>đ</td>
+            </tr>
+        <?php endforeach; ?>
+    </table>
+</body>
+
+</html>

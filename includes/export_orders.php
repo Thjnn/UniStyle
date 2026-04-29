@@ -1,32 +1,7 @@
 <?php
-// KHÔNG có khoảng trắng trước dòng này!
-
 require_once __DIR__ . '/../config/db.php';
 
-// Kiểm tra header đã gửi chưa
-if (headers_sent()) {
-    die("Lỗi: Header đã được gửi trước đó!");
-}
-
-// Header tải file CSV
-header('Content-Type: text/csv; charset=utf-8');
-header('Content-Disposition: attachment; filename=Danh_sach_don_hang_' . date('d-m-Y') . '.csv');
-
-// Mở output
-$output = fopen('php://output', 'w');
-
-// BOM UTF-8 (fix lỗi tiếng Việt trong Excel)
-fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));
-
-// Tiêu đề
-fputcsv($output, ['DANH SÁCH ĐƠN HÀNG']);
-fputcsv($output, ['Ngày xuất:', date('d/m/Y H:i')]);
-fputcsv($output, []);
-
-// Header cột
-fputcsv($output, ['Mã Đơn', 'Khách Hàng', 'Ngày Đặt', 'Tổng Tiền', 'Trạng Thái']);
-
-// SQL (đúng theo DB của bạn)
+// ── TRUY VẤN DỮ LIỆU ────────────────────────────────────────────────────────
 $sql = "SELECT 
             d.madh AS madon,
             k.tenkh AS hoten,
@@ -38,27 +13,152 @@ $sql = "SELECT
         ORDER BY d.ngaydat DESC";
 
 $result = $conn->query($sql);
-
-// Nếu lỗi SQL → dừng luôn (để debug)
-if (!$result) {
-    die("SQL lỗi: " . $conn->error);
+$rows = [];
+if ($result) {
+    while ($r = $result->fetch_assoc()) $rows[] = $r;
 }
 
-// Xuất dữ liệu
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        fputcsv($output, [
-            $row['madon'],
-            $row['hoten'] ? $row['hoten'] : 'Không rõ',
-            $row['ngaydat'] ? date('d/m/Y', strtotime($row['ngaydat'])) : '',
-            number_format($row['tongtien']) . ' VND',
-            $row['trangthai']
-        ]);
-    }
-} else {
-    fputcsv($output, ['Không có dữ liệu']);
-}
+$filename = 'Danh-sach-don-hang-' . date('d-m-Y');
 
-// Đóng file
-fclose($output);
-exit();
+// ── CẤU HÌNH HEADER EXCEL ───────────────────────────────────────────────────
+header('Content-Type: application/vnd.ms-excel; charset=utf-8');
+header("Content-Disposition: attachment; filename=\"{$filename}.xls\"");
+header('Cache-Control: no-cache, must-revalidate');
+header('Pragma: no-cache');
+?>
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+    xmlns:x="urn:schemas-microsoft-com:office:excel"
+    xmlns="http://www.w3.org/TR/REC-html40">
+
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th {
+            background-color: #1d4ed8;
+            color: #ffffff;
+            font-weight: bold;
+            text-align: center;
+            padding: 10px;
+            border: 1px solid #1e40af;
+        }
+
+        td {
+            padding: 8px 10px;
+            border: 1px solid #e2e8f0;
+            vertical-align: middle;
+        }
+
+        tr:nth-child(even) td {
+            background-color: #f8fafc;
+        }
+
+        /* Màu sắc cho trạng thái đơn hàng */
+        .status-success {
+            color: #166534;
+            font-weight: bold;
+        }
+
+        /* Hoàn thành / Đã giao */
+        .status-warning {
+            color: #92400e;
+            font-weight: bold;
+        }
+
+        /* Đang xử lý / Chờ duyệt */
+        .status-danger {
+            color: #991b1b;
+            font-weight: bold;
+        }
+
+        /* Hủy đơn */
+
+        .ta-right {
+            text-align: right;
+        }
+
+        .ta-center {
+            text-align: center;
+        }
+
+        .header-row td {
+            background: #eff6ff;
+            font-weight: 700;
+            font-size: 14pt;
+            padding: 10px;
+            border: none;
+        }
+
+        .meta-row td {
+            color: #64748b;
+            font-size: 10pt;
+            border: none;
+            padding: 4px 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <table>
+        <tr class="header-row">
+            <td colspan="5">📦 DANH SÁCH ĐƠN HÀNG — UniStyle</td>
+        </tr>
+        <tr class="meta-row">
+            <td colspan="5">
+                Ngày xuất: <?= date('d/m/Y H:i') ?> | Tổng cộng: <?= count($rows) ?> đơn hàng
+            </td>
+        </tr>
+        <tr>
+            <td colspan="5" style="border:none; height:10px;"></td>
+        </tr>
+
+        <tr>
+            <th style="width:100px">Mã Đơn</th>
+            <th style="width:250px">Khách Hàng</th>
+            <th style="width:150px">Ngày Đặt</th>
+            <th style="width:150px">Tổng Tiền</th>
+            <th style="width:150px">Trạng Thái</th>
+        </tr>
+
+        <?php if (!empty($rows)): ?>
+            <?php foreach ($rows as $r):
+                // Xử lý logic màu sắc trạng thái
+                $tt = $r['trangthai'];
+                $cls = '';
+                if ($tt == 'Hoàn thành' || $tt == 'Đã giao') $cls = 'status-success';
+                elseif ($tt == 'Hủy đơn') $cls = 'status-danger';
+                else $cls = 'status-warning';
+            ?>
+                <tr>
+                    <td class="ta-center">#<?= $r['madon'] ?></td>
+                    <td><?= htmlspecialchars($r['hoten'] ?? 'Khách vãng lai') ?></td>
+                    <td class="ta-center"><?= $r['ngaydat'] ? date('d/m/Y', strtotime($r['ngaydat'])) : '—' ?></td>
+                    <td class="ta-right" style="font-weight:bold;"><?= number_format($r['tongtien'], 0, ',', '.') ?>đ</td>
+                    <td class="ta-center <?= $cls ?>"><?= $tt ?></td>
+                </tr>
+            <?php endforeach; ?>
+
+            <tr>
+                <td colspan="3" style="font-weight:700; background:#f1f5f9; text-align:right;">TỔNG DOANH THU:</td>
+                <td class="ta-right" style="font-weight:700; background:#f1f5f9; color:#1d4ed8;">
+                    <?= number_format(array_sum(array_column($rows, 'tongtien')), 0, ',', '.') ?>đ
+                </td>
+                <td style="background:#f1f5f9;"></td>
+            </tr>
+        <?php else: ?>
+            <tr>
+                <td colspan="5" class="ta-center">Không tìm thấy đơn hàng nào trong hệ thống.</td>
+            </tr>
+        <?php endif; ?>
+    </table>
+</body>
+
+</html>
