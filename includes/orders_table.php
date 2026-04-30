@@ -121,7 +121,7 @@ function getSanPham($conn, $madh)
     </tr>
 <?php else: ?>
     <?php while ($row = $result->fetch_assoc()): ?>
-        <tr>
+        <tr data-oid="<?= $row['madh'] ?>">
             <td><strong>#DH-<?= $row['madh'] ?></strong></td>
             <td><?= htmlspecialchars($row['tenkh'] ?? '---') ?></td>
             <td><?= date('d/m/Y', strtotime($row['ngaydat'])) ?></td>

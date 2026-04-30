@@ -435,52 +435,9 @@ $orders_today = $row_today['total_today'];
                 <div class="card-title">Thông báo</div>
               </div>
               <div class="card-body" style="padding-top: 12px">
-                <div class="notif-list">
-                  <div class="notif-item">
-                    <div class="notif-dot-wrap">
-                      <div class="notif-dot dot-blue"></div>
-                    </div>
-                    <div>
-                      <div class="notif-text">
-                        Tồn kho <strong>Bút chì 2B Staedtler</strong> còn 8
-                        hộp — cần nhập thêm
-                      </div>
-                      <div class="notif-time">5 phút trước</div>
-                    </div>
-                  </div>
-                  <div class="notif-item">
-                    <div class="notif-dot-wrap">
-                      <div class="notif-dot dot-blue"></div>
-                    </div>
-                    <div>
-                      <div class="notif-text">
-                        12 đơn hàng mới đang chờ xác nhận
-                      </div>
-                      <div class="notif-time">23 phút trước</div>
-                    </div>
-                  </div>
-                  <div class="notif-item">
-                    <div class="notif-dot-wrap">
-                      <div class="notif-dot dot-gray"></div>
-                    </div>
-                    <div>
-                      <div class="notif-text">
-                        Cty TNHH ABC thanh toán đơn #DH-1038 thành công
-                      </div>
-                      <div class="notif-time">1 giờ trước</div>
-                    </div>
-                  </div>
-                  <div class="notif-item">
-                    <div class="notif-dot-wrap">
-                      <div class="notif-dot dot-gray"></div>
-                    </div>
-                    <div>
-                      <div class="notif-text">
-                        Báo cáo tháng 2/2026 đã sẵn sàng để xuất
-                      </div>
-                      <div class="notif-time">3 giờ trước</div>
-                    </div>
-                  </div>
+                <div class="notif-list" id="dashboard-notifications">
+                  <!-- Dữ liệu sẽ được load từ JS -->
+                  <div class="modal-loading">Đang tải thông báo...</div>
                 </div>
               </div>
             </div>
@@ -1070,6 +1027,37 @@ $orders_today = $row_today['total_today'];
       <div class="modal-footer" id="ads-form-footer"></div>
     </div>
   </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const rawHash = window.location.hash.replace(/^#/, "").trim();
+      if (!rawHash) return;
+
+      const params = new URLSearchParams(rawHash);
+      const page = params.get("page");
+      const targetKey = params.get("targetKey");
+      const targetId = params.get("targetId");
+
+      if (!page || typeof showPage !== "function") return;
+
+      const navItem = document.querySelector(`.nav-item[onclick*="'${page}'"]`);
+      showPage(page, navItem);
+
+      if (targetKey && targetId) {
+        setTimeout(() => {
+          const row = document.querySelector(`[${targetKey}="${targetId}"]`);
+          if (!row) return;
+
+          row.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+          });
+          row.classList.add("notif-highlight");
+          setTimeout(() => row.classList.remove("notif-highlight"), 2200);
+        }, 220);
+      }
+    });
+  </script>
 </body>
 
 </html>
