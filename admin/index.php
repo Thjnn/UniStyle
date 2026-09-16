@@ -774,7 +774,7 @@ $orders_today = $row_today['total_today'];
       </div>
       <div class="modal-footer">
         <button class="btn" onclick="closeNhapKhoModal(true)">Hủy</button>
-        <button class="btn btn-primary" onclick="submitNhapKho()">
+        <button class="btn btn-primary" id="nhapkho-submit-btn" onclick="submitNhapKho()">
           <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
             <path d="M8 2v12M2 8l6 6 6-6" />
           </svg>

@@ -725,23 +725,42 @@ if (isset($_GET['ajax_suggest'])) {
         });
     </script>
 
-    <!-- ══ FOOTER ══════════════════════════════════════════════════════════ -->
+    <!-- Footer -->
     <footer class="footer">
         <div class="footer-newsletter">
             <div class="newsletter-text">
                 <h2>Đăng ký để nhận ưu đãi</h2>
-                <p>Đăng ký nhận bản tin để nhận ưu đãi và giảm giá độc quyền!</p>
+                <p>
+                    Đăng ký nhận bản tin của chúng tôi để nhận các ưu đãi và giảm giá
+                    độc quyền!
+                </p>
             </div>
-            <div class="newsletter-form"><input type="email" placeholder="Email của bạn..." /><button><span
-                        class="material-symbols-outlined">mail</span></button></div>
+
+            <div class="newsletter-form">
+                <input type="email" placeholder="Email của bạn..." />
+                <button>
+                    <span class="material-symbols-outlined">mail</span>
+                </button>
+            </div>
         </div>
+
         <div class="footer-container">
             <div class="footer-col">
-                <h2 class="logo"><img src="./assets/file_anh/0c4690d7-3599-4de4-a0a4-841817ead1c0.png" alt="" />
-                    UniStyle</h2>
-                <p>Liên hệ: <span>support@example.com</span></p>
+                <h2 class="logo">
+                    <img
+                        src="./assets/file_anh/0c4690d7-3599-4de4-a0a4-841817ead1c0.png"
+                        alt="" />
+                    UniStyle
+                </h2>
+                <p>
+                    Nếu bạn có bất kỳ thắc mắc nào, vui lòng liên hệ với chúng tôi theo
+                    địa chỉ sau:
+                    <span>support@example.com</span>
+                </p>
+
                 <p>📍 16 Thiên Hộ Vương, P1, Mỹ Tho, Tiền Giang</p>
                 <p>📞 (+84) 0777331314</p>
+
                 <div class="social-icons">
                     <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
                     <a href="#"><i class="fa-brands fa-instagram"></i></a>
@@ -750,31 +769,40 @@ if (isset($_GET['ajax_suggest'])) {
                     <a href="#"><i class="fa-brands fa-pinterest-p"></i></a>
                 </div>
             </div>
+
             <div class="footer-col">
                 <h3>Công ty</h3>
                 <ul>
-                    <li><a href="#">Tuyển dụng</a></li>
-                    <li><a href="#">Về chúng tôi</a></li>
-                    <li><a href="#">Quy tắc kinh doanh</a></li>
-                    <li><a href="#">Hợp tác sự kiện</a></li>
+                    <li><a href="aboutus.php">Tuyển dụng</a></li>
+                    <li><a href="aboutus.php">Về chúng tôi</a></li>
+                    <li><a href="aboutus.php">Quy tắc kinh doanh</a></li>
+                    <li><a href="aboutus.php">Hợp tác sự kiện</a></li>
+                    <li><a href="aboutus.php">Nhà cung cấp</a></li>
+                    <li><a href="aboutus.php">Chương trình cộng tác viên</a></li>
                 </ul>
             </div>
+
             <div class="footer-col">
                 <h3>Chăm sóc khách hàng</h3>
                 <ul>
-                    <li><a href="#">Theo dõi đơn hàng</a></li>
-                    <li><a href="#">Đổi / Trả hàng</a></li>
-                    <li><a href="#">Thông tin vận chuyển</a></li>
-                    <li><a href="#">Liên hệ</a></li>
+                    <li><a href="FAQ.php">Theo dõi đơn hàng</a></li>
+                    <li><a href="FAQ.php">Đổi / Trả hàng</a></li>
+                    <li><a href="FAQ.php">Thông tin vận chuyển</a></li>
+                    <li><a href="FAQ.php">Chính sách bảo hành</a></li>
+                    <li><a href="FAQ.php">Hệ thống cửa hàng</a></li>
+                    <li><a href="contact.php">Liên hệ</a></li>
                 </ul>
             </div>
+
             <div class="footer-col">
                 <h3>Dịch vụ</h3>
                 <ul>
-                    <li><a href="#">In ấn - Photo</a></li>
-                    <li><a href="#">Đóng gáy tài liệu</a></li>
-                    <li><a href="#">Cung cấp sỉ văn phòng phẩm</a></li>
-                    <li><a href="#">Đặt hàng theo yêu cầu</a></li>
+                    <li><a href="contact.php">In ấn - Photo</a></li>
+                    <li><a href="shop.php">Đóng gáy tài liệu</a></li>
+                    <li><a href="shop.php">Laminating (Ép nhựa)</a></li>
+                    <li><a href="shop.php">Cung cấp sỉ văn phòng phẩm</a></li>
+                    <li><a href="shop.php">Đặt hàng theo yêu cầu</a></li>
+                    <li><a href="contact.php">Trung tâm hỗ trợ</a></li>
                 </ul>
             </div>
         </div>

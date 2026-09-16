@@ -2,39 +2,39 @@
     session_start();
 
     // ================== THÊM GIỎ HÀNG ==================
-  if (isset($_POST['addcart'])) {
+    if (isset($_POST['addcart'])) {
 
-    $id = (int)$_POST['masp'];
-    $size = $_POST['size'];
-    $qty = (int)$_POST['soluong'];
+        $id = (int)$_POST['masp'];
+        $size = $_POST['size'];
+        $qty = (int)$_POST['soluong'];
 
-    $found = false;
+        $found = false;
 
-    if (!empty($_SESSION['cart'])) {
-        foreach ($_SESSION['cart'] as &$cart_item) {
-            if ($cart_item['masp'] == $id && $cart_item['size'] == $size) {
-                $cart_item['soluong'] += $qty;
-                $found = true;
-                break;
+        if (!empty($_SESSION['cart'])) {
+            foreach ($_SESSION['cart'] as &$cart_item) {
+                if ($cart_item['masp'] == $id && $cart_item['size'] == $size) {
+                    $cart_item['soluong'] += $qty;
+                    $found = true;
+                    break;
+                }
             }
         }
-    }
 
-    if (!$found) {
-        $_SESSION['cart'][] = [
-            "masp" => $id,
-            "tensp" => $_POST['tensp'],
-            "gia" => (int)$_POST['gia'],
-            "hinh" => $_POST['hinh'],
-            "size" => $size,
-            "soluong" => $qty
-        ];
+        if (!$found) {
+            $_SESSION['cart'][] = [
+                "masp" => $id,
+                "tensp" => $_POST['tensp'],
+                "gia" => (int)$_POST['gia'],
+                "hinh" => $_POST['hinh'],
+                "size" => $size,
+                "soluong" => $qty
+            ];
+        }
     }
-}
     // ================== KẾT NỐI DB ==================
     include("./config/db.php");
     if ($conn->connect_error) {
-        die("Kết nối thất bại: " . $conn->connect_error);   
+        die("Kết nối thất bại: " . $conn->connect_error);
     }
 
     $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
@@ -69,35 +69,35 @@
     $result_lq = mysqli_query($conn, $sql_lq);
 
     if (isset($_POST['buyNow'])) {
-if (isset($_POST['addcart'])) {
+        if (isset($_POST['addcart'])) {
 
-    $id = (int)$_POST['masp'];
-    $size = $_POST['size'];
-    $qty = (int)$_POST['soluong'];
+            $id = (int)$_POST['masp'];
+            $size = $_POST['size'];
+            $qty = (int)$_POST['soluong'];
 
-    $found = false;
+            $found = false;
 
-    if (!empty($_SESSION['cart'])) {
-        foreach ($_SESSION['cart'] as &$cart_item) {
-            if ($cart_item['masp'] == $id && $cart_item['size'] == $size) {
-                $cart_item['soluong'] += $qty;
-                $found = true;
-                break;
+            if (!empty($_SESSION['cart'])) {
+                foreach ($_SESSION['cart'] as &$cart_item) {
+                    if ($cart_item['masp'] == $id && $cart_item['size'] == $size) {
+                        $cart_item['soluong'] += $qty;
+                        $found = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!$found) {
+                $_SESSION['cart'][] = [
+                    "masp" => $id,
+                    "tensp" => $_POST['tensp'],
+                    "gia" => (int)$_POST['gia'],
+                    "hinh" => $_POST['hinh'],
+                    "size" => $size,
+                    "soluong" => $qty
+                ];
             }
         }
-    }
-
-    if (!$found) {
-        $_SESSION['cart'][] = [
-            "masp" => $id,
-            "tensp" => $_POST['tensp'],
-            "gia" => (int)$_POST['gia'],
-            "hinh" => $_POST['hinh'],
-            "size" => $size,
-            "soluong" => $qty
-        ];
-    }
-}
         // 👉 chuyển trang
         header("Location: package.php");
         exit();
@@ -122,25 +122,25 @@ if (isset($_POST['addcart'])) {
         <link rel="stylesheet" href="./assets/css/responsive.css" />
 
         <style>
-        .cart-icon {
-            position: relative;
-        }
+            .cart-icon {
+                position: relative;
+            }
 
-        .cart-count {
-            position: absolute;
-            top: -8px;
-            right: -10px;
-            background: red;
-            color: #fff;
-            font-size: 12px;
-            padding: 3px 7px;
-            border-radius: 50%;
-        }
+            .cart-count {
+                position: absolute;
+                top: -8px;
+                right: -10px;
+                background: red;
+                color: #fff;
+                font-size: 12px;
+                padding: 3px 7px;
+                border-radius: 50%;
+            }
 
-        .variant-btn.active {
-            background: black;
-            color: white;
-        }
+            .variant-btn.active {
+                background: black;
+                color: white;
+            }
         </style>
     </head>
 
@@ -177,7 +177,7 @@ if (isset($_POST['addcart'])) {
                                 <span class="material-symbols-outlined">local_mall</span>
 
                                 <?php if ($totalQty > 0): ?>
-                                <span class="cart-count"><?= $totalQty ?></span>
+                                    <span class="cart-count"><?= $totalQty ?></span>
                                 <?php endif; ?>
                             </a>
                         </div>
@@ -229,9 +229,9 @@ if (isset($_POST['addcart'])) {
                         <label>Phân loại:</label>
                         <div class="variant-list">
                             <?php while ($bt = mysqli_fetch_assoc($result_bt)) { ?>
-                            <button class="variant-btn">
-                                <?php echo $bt['LoaiThuocTinh'] . " - " . $bt['GiaTri']; ?>
-                            </button>
+                                <button class="variant-btn">
+                                    <?php echo $bt['LoaiThuocTinh'] . " - " . $bt['GiaTri']; ?>
+                                </button>
                             <?php } ?>
                         </div>
                     </div>
@@ -247,17 +247,17 @@ if (isset($_POST['addcart'])) {
                         <!-- Số lượng tồn kho -->
                         <div class="stock-info">
                             <?php if ($sp['SoLuongTon'] > 0): ?>
-                            <span class="stock-count">
-                                <span class="material-symbols-outlined"
-                                    style="font-size:16px;vertical-align:middle;color:#26aa99">inventory_2</span>
-                                Còn lại: <strong><?= number_format($sp['SoLuongTon']) ?></strong> sản phẩm
-                            </span>
+                                <span class="stock-count">
+                                    <span class="material-symbols-outlined"
+                                        style="font-size:16px;vertical-align:middle;color:#26aa99">inventory_2</span>
+                                    Còn lại: <strong><?= number_format($sp['SoLuongTon']) ?></strong> sản phẩm
+                                </span>
                             <?php else: ?>
-                            <span class="out-of-stock">
-                                <span class="material-symbols-outlined"
-                                    style="font-size:16px;vertical-align:middle">remove_shopping_cart</span>
-                                Hết hàng
-                            </span>
+                                <span class="out-of-stock">
+                                    <span class="material-symbols-outlined"
+                                        style="font-size:16px;vertical-align:middle">remove_shopping_cart</span>
+                                    Hết hàng
+                                </span>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -295,25 +295,25 @@ if (isset($_POST['addcart'])) {
 
                 <?php while ($lq = mysqli_fetch_assoc($result_lq)) { ?>
 
-                <div class="product-card">
-                    <a href="product-detail.php?id=<?php echo $lq['MaSP']; ?>">
+                    <div class="product-card">
+                        <a href="product-detail.php?id=<?php echo $lq['MaSP']; ?>">
 
-                        <div class="product-img">
-                            <img src="assets/file_anh/San_Pham/<?php echo $lq['Hinh']; ?>" />
-                        </div>
-
-                        <div class="product-info">
-                            <h3 class="product-name">
-                                <?php echo $lq['TenSP']; ?>
-                            </h3>
-
-                            <div class="price">
-                                <?php echo number_format($lq['GiaBan']); ?>đ
+                            <div class="product-img">
+                                <img src="assets/file_anh/San_Pham/<?php echo $lq['Hinh']; ?>" />
                             </div>
-                        </div>
 
-                    </a>
-                </div>
+                            <div class="product-info">
+                                <h3 class="product-name">
+                                    <?php echo $lq['TenSP']; ?>
+                                </h3>
+
+                                <div class="price">
+                                    <?php echo number_format($lq['GiaBan']); ?>đ
+                                </div>
+                            </div>
+
+                        </a>
+                    </div>
 
                 <?php } ?>
 
@@ -325,8 +325,8 @@ if (isset($_POST['addcart'])) {
                 </p>
             </div>
         </section>
+        <!-- Footer -->
         <footer class="footer">
-            <!-- Newsletter -->
             <div class="footer-newsletter">
                 <div class="newsletter-text">
                     <h2>Đăng ký để nhận ưu đãi</h2>
@@ -344,18 +344,18 @@ if (isset($_POST['addcart'])) {
                 </div>
             </div>
 
-            <!-- Footer content -->
             <div class="footer-container">
-                <!-- Logo + contact -->
                 <div class="footer-col">
                     <h2 class="logo">
-                        <img src="./assets/file_anh/0c4690d7-3599-4de4-a0a4-841817ead1c0.png" alt="" />
+                        <img
+                            src="./assets/file_anh/0c4690d7-3599-4de4-a0a4-841817ead1c0.png"
+                            alt="" />
                         UniStyle
                     </h2>
                     <p>
                         Nếu bạn có bất kỳ thắc mắc nào, vui lòng liên hệ với chúng tôi theo
                         địa chỉ sau:
-                        <span>support@example.</span>
+                        <span>support@example.com</span>
                     </p>
 
                     <p>📍 16 Thiên Hộ Vương, P1, Mỹ Tho, Tiền Giang</p>
@@ -370,67 +370,64 @@ if (isset($_POST['addcart'])) {
                     </div>
                 </div>
 
-                <!-- Công ty -->
                 <div class="footer-col">
                     <h3>Công ty</h3>
                     <ul>
-                        <li><a href="#">Tuyển dụng</a></li>
-                        <li><a href="#">Về chúng tôi</a></li>
-                        <li><a href="#">Quy tắc kinh doanh</a></li>
-                        <li><a href="#">Hợp tác sự kiện</a></li>
-                        <li><a href="#">Nhà cung cấp</a></li>
-                        <li><a href="#">Chương trình cộng tác viên</a></li>
+                        <li><a href="aboutus.php">Tuyển dụng</a></li>
+                        <li><a href="aboutus.php">Về chúng tôi</a></li>
+                        <li><a href="aboutus.php">Quy tắc kinh doanh</a></li>
+                        <li><a href="aboutus.php">Hợp tác sự kiện</a></li>
+                        <li><a href="aboutus.php">Nhà cung cấp</a></li>
+                        <li><a href="aboutus.php">Chương trình cộng tác viên</a></li>
                     </ul>
                 </div>
 
-                <!-- Chăm sóc khách hàng -->
                 <div class="footer-col">
                     <h3>Chăm sóc khách hàng</h3>
                     <ul>
-                        <li><a href="#">Theo dõi đơn hàng</a></li>
-                        <li><a href="#">Đổi / Trả hàng</a></li>
-                        <li><a href="#">Thông tin vận chuyển</a></li>
-                        <li><a href="#">Chính sách bảo hành</a></li>
-                        <li><a href="#">Hệ thống cửa hàng</a></li>
-                        <li><a href="#">Liên hệ</a></li>
+                        <li><a href="FAQ.php">Theo dõi đơn hàng</a></li>
+                        <li><a href="FAQ.php">Đổi / Trả hàng</a></li>
+                        <li><a href="FAQ.php">Thông tin vận chuyển</a></li>
+                        <li><a href="FAQ.php">Chính sách bảo hành</a></li>
+                        <li><a href="FAQ.php">Hệ thống cửa hàng</a></li>
+                        <li><a href="contact.php">Liên hệ</a></li>
                     </ul>
                 </div>
 
-                <!-- Dịch vụ -->
                 <div class="footer-col">
                     <h3>Dịch vụ</h3>
                     <ul>
-                        <li><a href="#">In ấn - Photo</a></li>
-                        <li><a href="#">Đóng gáy tài liệu</a></li>
-                        <li><a href="#">Laminating (Ép nhựa)</a></li>
-                        <li><a href="#">Cung cấp sỉ văn phòng phẩm</a></li>
-                        <li><a href="#">Đặt hàng theo yêu cầu</a></li>
-                        <li><a href="#">Trung tâm hỗ trợ</a></li>
+                        <li><a href="contact.php">In ấn - Photo</a></li>
+                        <li><a href="shop.php">Đóng gáy tài liệu</a></li>
+                        <li><a href="shop.php">Laminating (Ép nhựa)</a></li>
+                        <li><a href="shop.php">Cung cấp sỉ văn phòng phẩm</a></li>
+                        <li><a href="shop.php">Đặt hàng theo yêu cầu</a></li>
+                        <li><a href="contact.php">Trung tâm hỗ trợ</a></li>
                     </ul>
                 </div>
             </div>
         </footer>
         <!-- SCRIPT -->
         <script>
-        function changeQty(num) {
-            let qty = document.getElementById("qty");
-            let value = parseInt(qty.value) || 1;
-            value += num;
-            if (value < 1) value = 1;
-            qty.value = value;
-        }
-
-        let selectedSize = "";
-
-        document.querySelectorAll(".variant-btn").forEach(btn => {
-            btn.onclick = function() {
-                document.querySelectorAll(".variant-btn").forEach(b => b.classList.remove("active"));
-                this.classList.add("active");
-
-                selectedSize = this.innerText;
-                document.getElementById("selectedSize").value = selectedSize;
+            function changeQty(num) {
+                let qty = document.getElementById("qty");
+                let value = parseInt(qty.value) || 1;
+                value += num;
+                if (value < 1) value = 1;
+                qty.value = value;
             }
-        });
+
+            let selectedSize = "";
+
+            document.querySelectorAll(".variant-btn").forEach(btn => {
+                btn.onclick = function() {
+                    document.querySelectorAll(".variant-btn").forEach(b => b.classList.remove("active"));
+                    this.classList.add("active");
+
+                    selectedSize = this.innerText;
+                    document.getElementById("selectedSize").value = selectedSize;
+                }
+            });
         </script>
 
     </body>

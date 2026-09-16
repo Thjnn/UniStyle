@@ -4,6 +4,25 @@ require_once __DIR__ . '/../config/db.php';
 header('Content-Type: application/json; charset=utf-8');
 
 $notifications = [];
+$pendingStatuses = ['Chờ xác nhận', 'Chờ xử lý', 'Đang xử lý'];
+
+function sqlInList(array $values, mysqli $conn)
+{
+    $escaped = array_map(
+        static fn($value) => "'" . $conn->real_escape_string($value) . "'",
+        $values
+    );
+    return implode(', ', $escaped);
+}
+
+function formatNotificationTime($time)
+{
+    $ts = strtotime((string) $time);
+    if (!$ts) {
+        return '';
+    }
+    return date('H:i d/m/Y', $ts);
+}
 
 function buildNotificationLink($page, $targetId = null, $targetKey = null)
 {
@@ -22,6 +41,7 @@ function pushNotification(&$notifications, $text, $type, $time, $page, $targetId
         'text' => $text,
         'type' => $type,
         'time' => $time,
+        'display_time' => formatNotificationTime($time),
         'link' => buildNotificationLink($page, $targetId, $targetKey),
         'page' => $page,
         'target_id' => $targetId,
@@ -29,16 +49,18 @@ function pushNotification(&$notifications, $text, $type, $time, $page, $targetId
     ];
 }
 
+$pendingStatusesSql = sqlInList($pendingStatuses, $conn);
+
 $pendingCount = (int) ($conn->query("
     SELECT COUNT(*) AS total
     FROM dathang
-    WHERE trangthai = 'Chờ xử lý'
+    WHERE trangthai IN ($pendingStatusesSql)
 ")->fetch_assoc()['total'] ?? 0);
 
 if ($pendingCount > 0) {
     pushNotification(
         $notifications,
-        "Có {$pendingCount} đơn hàng đang chờ xử lý",
+        "Có {$pendingCount} đơn hàng đang chờ xác nhận/xử lý",
         'warning',
         date('Y-m-d H:i:s'),
         'orders'
@@ -79,11 +101,11 @@ if ($cancelledTodayCount > 0) {
 }
 
 $pendingOrders = $conn->query("
-    SELECT dh.madh, dh.ngaydat, kh.tenkh
+    SELECT dh.madh, dh.ngaydat, kh.tenkh, dh.trangthai
     FROM dathang dh
     LEFT JOIN khachhang kh ON kh.makh = dh.makh
-    WHERE dh.trangthai = 'Chờ xử lý'
-    ORDER BY dh.ngaydat DESC
+    WHERE dh.trangthai IN ($pendingStatusesSql)
+    ORDER BY dh.ngaydat DESC, dh.madh DESC
     LIMIT 3
 ");
 
@@ -93,7 +115,7 @@ if ($pendingOrders) {
         $suffix = $customerName !== '' ? " từ {$customerName}" : '';
         pushNotification(
             $notifications,
-            "Đơn #DH-{$row['madh']} đang chờ xử lý{$suffix}",
+            "Đơn #DH-{$row['madh']} đang {$row['trangthai']}{$suffix}",
             'warning',
             $row['ngaydat'],
             'orders',

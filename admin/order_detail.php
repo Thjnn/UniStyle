@@ -45,7 +45,7 @@ while ($row = $res->fetch_assoc()) {
 
 echo json_encode([
     'madh'     => $r['madh'],
-    'ngaydat'  => date('d/m/Y', strtotime($r['ngaydat'])),
+    'ngaydat'  => date('H:i d/m/Y', strtotime($r['ngaydat'])),
     'tongtien' => (float)$r['tongtien'],
     'trangthai' => $r['trangthai'],
     'tenkh'    => $r['tenkh'] ?? 'Không rõ',

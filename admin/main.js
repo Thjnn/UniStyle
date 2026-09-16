@@ -38,6 +38,9 @@ function filterChip(el) {
 function exportDashboardExcel() {
   window.location.href = "../includes/export_dashboard.php";
 }
+const DASHBOARD_NOTIFICATION_LIMIT = 5;
+let dashboardNotificationsExpanded = false;
+
 function escapeHTML(str) {
   return str.replace(/[&<>"']/g, function (m) {
     return {
@@ -48,6 +51,39 @@ function escapeHTML(str) {
       "'": "&#039;",
     }[m];
   });
+}
+
+function renderDashboardNotifications(container, notifications) {
+  const visibleNotifications = dashboardNotificationsExpanded
+    ? notifications
+    : notifications.slice(0, DASHBOARD_NOTIFICATION_LIMIT);
+
+  const itemsHTML = visibleNotifications
+    .map((n) => {
+      return `
+        <div class="notif-item" onclick="handleNotifClick('${n.link || "#"}')">
+          <div class="notif-dot-wrap">
+            <div class="notif-dot dot-${n.type || "info"}"></div>
+          </div>
+          <div class="notif-content">
+            <div class="notif-text">${escapeHTML(n.text)}</div>
+            <div class="notif-time">${n.display_time || n.time || ""}</div>
+          </div>
+        </div>
+      `;
+    })
+    .join("");
+
+  const shouldShowToggle = notifications.length > DASHBOARD_NOTIFICATION_LIMIT;
+  const toggleHTML = shouldShowToggle
+    ? `
+        <button type="button" class="notif-more-btn" onclick="toggleDashboardNotifications()">
+          ${dashboardNotificationsExpanded ? "Thu gọn" : "Xem thêm"}
+        </button>
+      `
+    : "";
+
+  container.innerHTML = itemsHTML + toggleHTML;
 }
 
 async function loadNotifications() {
@@ -68,21 +104,7 @@ async function loadNotifications() {
       return;
     }
 
-    container.innerHTML = data
-      .map((n) => {
-        return `
-        <div class="notif-item" onclick="handleNotifClick('${n.link || "#"}')">
-          <div class="notif-dot-wrap">
-            <div class="notif-dot dot-${n.type || "info"}"></div>
-          </div>
-          <div class="notif-content">
-            <div class="notif-text">${escapeHTML(n.text)}</div>
-            <div class="notif-time">${n.time || ""}</div>
-          </div>
-        </div>
-      `;
-      })
-      .join("");
+    renderDashboardNotifications(container, data);
   } catch (err) {
     container.innerHTML = `
       <div class="notif-error">
@@ -94,6 +116,11 @@ async function loadNotifications() {
 }
 
 // click chuyển trang
+function toggleDashboardNotifications() {
+  dashboardNotificationsExpanded = !dashboardNotificationsExpanded;
+  loadNotifications();
+}
+
 function handleNotifClick(link) {
   if (link && link !== "#") {
     window.location.href = link;
@@ -865,9 +892,15 @@ window.openNhapKhoModal = function (masp, tensp, hientai, hinh, sku) {
   document.getElementById("nhapkho-hientai").textContent =
     hientai <= 0 ? "0" : hientai;
   document.getElementById("nhapkho-soluong").value = 10;
-  document.getElementById("nhapkho-gianhap").value = "";
-  document.getElementById("nhapkho-ncc").value = "";
-  document.getElementById("nhapkho-ghichu").value = "";
+
+  const giaNhapInput = document.getElementById("nhapkho-gianhap");
+  if (giaNhapInput) giaNhapInput.value = "";
+
+  const nhaCungCapInput = document.getElementById("nhapkho-ncc");
+  if (nhaCungCapInput) nhaCungCapInput.value = "";
+
+  const ghiChuInput = document.getElementById("nhapkho-ghichu");
+  if (ghiChuInput) ghiChuInput.value = "";
 
   // Ảnh thumb
   const thumb = document.getElementById("nhapkho-sp-thumb");

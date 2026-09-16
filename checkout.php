@@ -142,7 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btn_order'])) {
 
         $conn->begin_transaction();
         try {
-            $ngaydat      = date('Y-m-d');
+            $ngaydat      = date('Y-m-d H:i:s');
             $trangthai_dh = 'Chờ xác nhận';
 
             // 1. dathang — lưu tongtien = giá thực trả

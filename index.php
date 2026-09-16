@@ -904,7 +904,7 @@ if (!empty($_SESSION['cart'])) {
       <div class="footer-col">
         <h3>Chăm sóc khách hàng</h3>
         <ul>
-          <li><a href="contact.php">Theo dõi đơn hàng</a></li>
+          <li><a href="FAQ.php">Theo dõi đơn hàng</a></li>
           <li><a href="FAQ.php">Đổi / Trả hàng</a></li>
           <li><a href="FAQ.php">Thông tin vận chuyển</a></li>
           <li><a href="FAQ.php">Chính sách bảo hành</a></li>
