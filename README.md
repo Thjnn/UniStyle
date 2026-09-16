@@ -75,14 +75,25 @@ $mail->SMTPSecure = 'tls';
 
 ## 7. Chạy dự án
 
-**Cách 1 — Dùng XAMPP/Laragon:**
-Copy toàn bộ thư mục `UniStyle` vào `htdocs` (XAMPP) hoặc `www` (Laragon), khởi động Apache + MySQL, sau đó truy cập:
+Cách đơn giản nhất là dùng **Laragon** (hoặc XAMPP tương tự):
+
+1. Copy toàn bộ thư mục `UniStyle` vào thư mục `www` của Laragon (thường là `C:\laragon\www\UniStyle`), hoặc `htdocs` nếu dùng XAMPP.
+2. Mở Laragon, nhấn **Start All** để bật Apache + MySQL.
+3. Mở trình duyệt và truy cập:
+
+```
+http://localhost/UniStyle/
+```
+
+hoặc
 
 ```
 http://localhost/UniStyle/index.php
 ```
 
-**Cách 2 — Dùng PHP built-in server:**
+> ⚠️ Lưu ý: không mở file `index.php` trực tiếp bằng cách double-click trong Explorer — làm vậy trình duyệt sẽ hiển thị sai hoặc không chạy được code PHP. Phải truy cập qua địa chỉ `localhost/...` như trên thì Apache mới xử lý được PHP.
+
+**Cách khác** — dùng PHP built-in server (không cần Laragon/XAMPP):
 
 ```bash
 php -S localhost:8000
